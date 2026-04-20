@@ -1,0 +1,8 @@
+[package]
+name = "mhgu-forge-rt"
+version = "0.1.0"
+description = "NRO runtime startup (MOD0 Header, init/fini, etc.) for forge plugins"
+license = "MIT"
+repository = "https://github.com/Fexty12573/forge-rs"
+keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
+categories = ["no-std", "game-engines", "embedded"]
