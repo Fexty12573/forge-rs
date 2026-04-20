@@ -1,0 +1,9 @@
+{
+    global:
+        init;
+        fini;
+        forge_onLoad;
+        forge_onUpdate;
+
+    local: *;
+};
