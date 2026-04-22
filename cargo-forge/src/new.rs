@@ -42,8 +42,7 @@ fn write_file(path: &Path, content: &str) -> Result<()> {
 
 fn cargo_toml(name: &str) -> String {
     format!(
-        r#"
-[package]
+        r#"[package]
 name = "{name}"
 version = "0.1.0"
 edition = "2024"
@@ -52,15 +51,14 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-forge = "{FORGE_VERSION}"
+mhgu-forge = "{FORGE_VERSION}"
 "#
     )
 }
 
 fn plugin_lib_rs() -> String {
     format!(
-        r#"
-#![no_std]
+        r#"#![no_std]
 
 #[forge::entry]
 fn main() {{}}
@@ -70,8 +68,7 @@ fn main() {{}}
 
 fn cargo_config() -> String {
     format!(
-        r#"
-[build]
+        r#"[build]
 target = "{}.json"
 
 [unstable]
