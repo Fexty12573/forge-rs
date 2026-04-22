@@ -6,3 +6,7 @@ license = "MIT"
 repository = "https://github.com/Fexty12573/forge-rs"
 keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
 categories = ["no-std", "game-engines", "embedded"]
+
+[lib]
+name = "forge_rt"
+path = "src/lib.rs"

@@ -1,6 +1,6 @@
 #![no_std]
 
-use core::arch::global_asm;
+use core::{arch::global_asm, panic::PanicInfo};
 
 #[used]
 #[no_mangle]
@@ -35,3 +35,9 @@ pub extern "C" fn init() {}
 
 #[no_mangle]
 pub extern "C" fn fini() {}
+
+#[cfg(not(test))]
+#[panic_handler]
+fn forge_panic(_info: &PanicInfo) -> ! {
+    loop {}
+}

@@ -1,0 +1,18 @@
+[package]
+name = "mhgu-forge"
+version = "0.1.0"
+edition = "2024"
+description = "Rust API for writing forge plugins for MHGU"
+license = "MIT"
+repository = "https://github.com/Fexty12573/forge-rs"
+keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
+categories = ["no-std", "game-engines", "embedded"]
+
+[lib]
+name = "forge"
+path = "src/lib.rs"
+
+[dependencies]
+# mhgu-forge-sys = { path = "../forge-sys", version = "0.1" }
+mhgu-forge-rt = { path = "../forge-rt", version = "0.1" }
+mhgu-forge-macros = { path = "../forge-macros", version = "0.1" }
