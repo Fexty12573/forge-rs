@@ -5,7 +5,7 @@ use clap::{Args, Parser, Subcommand};
 
 mod embedded;
 mod fbuild;
-mod init;
+mod new;
 
 #[derive(Parser)]
 #[command(name = "cargo")]
@@ -23,16 +23,19 @@ struct ForgeArgs {
 #[derive(Subcommand)]
 enum ForgeCommand {
     // Create a new forge plugin project
-    Init {
+    New {
         name: String,
 
         #[arg(long, default_value = ".")]
         path: PathBuf,
+
+        #[arg(short, long, action, help = "Add a .gitignore")]
+        git: bool,
     },
 
     // Build a forge plugin and convert the resulting ELF to an NRO
     Build {
-        #[arg(long)]
+        #[arg(short, long, help = "Build in release mode")]
         release: bool,
     },
 }
@@ -41,7 +44,7 @@ fn main() -> Result<()> {
     let Cargo::Forge(args) = Cargo::parse();
 
     match args.cmd {
-        ForgeCommand::Init { name, path } => init::init(&name, &path),
+        ForgeCommand::New { name, path, git } => new::new(&name, &path, git),
         ForgeCommand::Build { release } => fbuild::build(release),
     }
 }

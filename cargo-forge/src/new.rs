@@ -4,7 +4,7 @@ use std::path::Path;
 
 const FORGE_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub fn init(name: &str, dest: &Path) -> Result<()> {
+pub fn new(name: &str, dest: &Path, git: bool) -> Result<()> {
     let project_dir = dest.join(name);
     if project_dir.exists() {
         bail!("Directory '{}' already exists", project_dir.display());
@@ -21,6 +21,10 @@ pub fn init(name: &str, dest: &Path) -> Result<()> {
         &project_dir.join(format!("{}.json", embedded::TARGET_NAME)),
         embedded::TARGET_JSON,
     )?;
+
+    if git {
+        write_file(&project_dir.join(".gitignore"), GITIGNORE)?;
+    }
 
     println!("Created forge plugin '{name}' at {}", project_dir.display());
     println!("Build with: cd {name} && cargo forge build");
@@ -86,4 +90,9 @@ fn main() {
     println!("cargo:rustc-link-arg=-Wl,--build-id=sha1");
     println!("cargo:rerun-if-changed=link/switch32.ld");
 }
+"#;
+
+const GITIGNORE: &str = r#"
+target/
+*.nro
 "#;
