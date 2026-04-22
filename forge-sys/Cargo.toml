@@ -1,0 +1,12 @@
+[package]
+name = "mhgu-forge-sys"
+version = "0.1.0"
+description = "Raw FFI bindings to the forge plugin API"
+license = "MIT"
+repository = "https://github.com/Fexty12573/forge-rs"
+keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
+categories = ["no-std", "game-engines", "embedded"]
+
+[lib]
+name = "forge_sys"
+path = "src/lib.rs"

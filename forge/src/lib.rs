@@ -1,5 +1,6 @@
 #![no_std]
 
-extern crate forge_rt;
+pub extern crate forge_rt as rt;
+pub extern crate forge_sys as sys;
 
 pub use forge_macros::entry;
