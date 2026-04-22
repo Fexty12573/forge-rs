@@ -2,7 +2,7 @@
     "arch": "arm",
     "data-layout": "e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64",
     "llvm-target": "armv7a-none-eabi",
-    "os": "none",
+    "os": "switch",
     "env": "",
     "vendor": "none",
     "target-endian": "little",
@@ -10,8 +10,8 @@
     "target-c-int-width": 32,
     "linker": "arm-none-eabi-gcc",
     "linker-flavor": "gcc",
-    "abi": "aapcs",
-    "features": "+v8,+crc,+crypto,+soft-float",
+    "abi": "eabi",
+    "features": "+v8,+crc,+crypto",
     "max-atomic-width": 64,
     "panic-strategy": "abort",
     "relocation-model": "pic",
@@ -21,5 +21,11 @@
     "disable-redzone": false,
     "frame-pointer": "always",
     "no-default-libraries": true,
-    "emit-debug-gdb-scripts": false
+    "emit-debug-gdb-scripts": false,
+    "llvm-floatabi": "soft",
+    "has-thread-local": false,
+    "has-rpath": false,
+    "crt-static-default": false,
+    "crt-static-respected": false,
+    "position-independent-executables": true
 }
