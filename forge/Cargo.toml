@@ -12,7 +12,12 @@ categories = ["no-std", "game-engines", "embedded"]
 name = "forge"
 path = "src/lib.rs"
 
+[features]
+default = ["allocator"]
+allocator = []
+
 [dependencies]
 mhgu-forge-sys = { path = "../forge-sys", version = "0.1" }
 mhgu-forge-rt = { path = "../forge-rt", version = "0.1" }
 mhgu-forge-macros = { path = "../forge-macros", version = "0.1" }
+log = { version = "0.4", default-features = false }

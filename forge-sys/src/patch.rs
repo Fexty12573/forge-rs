@@ -10,7 +10,7 @@ pub struct Patch {
     enabled: bool,
 }
 
-extern "C" {
+unsafe extern "C" {
     pub fn forge_patch_create(address: u32, bytes: *const c_void, length: u32, enable: bool) -> Patch;
     pub fn forge_patch_destroy(patch: *mut Patch);
 

@@ -6,8 +6,8 @@ use core::arch::global_asm;
 use core::panic::PanicInfo;
 
 #[used]
-#[no_mangle]
-#[link_section = ".bss"]
+#[unsafe(no_mangle)]
+#[unsafe(link_section = ".bss")]
 static mut plugin_module_runtime: [u8; 0xD0] = [0u8; 0xD0];
 
 global_asm!(
@@ -37,10 +37,10 @@ global_asm!(
     "#
 );
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn init() {}
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn fini() {}
 
 #[cfg(not(test))]

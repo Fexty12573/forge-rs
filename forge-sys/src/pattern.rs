@@ -24,7 +24,7 @@ struct PatternByte {
     mask: u8,
 }
 
-extern "C" {
+unsafe extern "C" {
     pub fn forge_pattern_create(pattern: *const c_char) -> Pattern;
     pub fn forge_pattern_createBits(pattern: *const c_char) -> Pattern;
     pub fn forge_pattern_destroy(pattern: Pattern);

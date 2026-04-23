@@ -72,7 +72,7 @@ fn cargo_config() -> String {
 target = "{}.json"
 
 [unstable]
-build-std = ["core"]
+build-std = ["core", "alloc"]
 build-std-features = ["compiler-builtins-mem"]
 json-target-spec = true
 "#,

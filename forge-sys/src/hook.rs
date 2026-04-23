@@ -9,6 +9,6 @@ pub struct Hook {
     jit: [u8; 24], // Opaque data for libnx JIT structure
 }
 
-extern "C" {
+unsafe extern "C" {
     pub fn forge_hook_create(target: *const c_void, detour: *const c_void, original: *mut *const c_void) -> Hook;
 }

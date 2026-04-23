@@ -1,6 +1,7 @@
 [package]
 name = "mhgu-forge-rt"
 version = "0.1.0"
+edition = "2024"
 description = "NRO runtime startup (MOD0 Header, init/fini, etc.) for forge plugins"
 license = "MIT"
 repository = "https://github.com/Fexty12573/forge-rs"
