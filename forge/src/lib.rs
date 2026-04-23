@@ -12,3 +12,4 @@ pub use forge_macros::entry;
 mod allocator;
 
 pub mod log;
+pub mod mem;

@@ -1,27 +1,17 @@
-use core::{ffi::c_char, ptr::null};
+use core::ffi::c_char;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct Pattern {
-    pattern: *const PatternByte,
-    length: usize,
-}
-
-impl Pattern {
-    pub fn len(&self) -> usize {
-        self.length
-    }
-
-    pub fn valid(&self) -> bool {
-        self.pattern != null() && self.length != 0
-    }
+    pub pattern: *const PatternByte,
+    pub length: usize,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
-struct PatternByte {
-    value: u8,
-    mask: u8,
+pub struct PatternByte {
+    pub value: u8,
+    pub mask: u8,
 }
 
 unsafe extern "C" {
