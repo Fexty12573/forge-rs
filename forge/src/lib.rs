@@ -11,3 +11,4 @@ pub use forge_macros::entry;
 #[cfg(feature = "allocator")]
 mod allocator;
 
+pub mod log;
