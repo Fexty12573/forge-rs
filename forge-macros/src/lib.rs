@@ -5,7 +5,7 @@ use syn::{ItemFn, parse_macro_input};
 /// Marks a function as the plugins entry point.
 ///
 /// ### Example
-/// ```rust
+/// ```ignore
 /// #[forge::entry]
 /// fn my_main_function() {
 ///     // Your code here

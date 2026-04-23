@@ -1,21 +1,28 @@
 #![no_std]
 
-use core::{arch::global_asm, panic::PanicInfo};
+use core::arch::global_asm;
+
+#[cfg(not(test))]
+use core::panic::PanicInfo;
 
 #[used]
 #[no_mangle]
 #[link_section = ".bss"]
-pub static mut plugin_module_runtime: [u8; 0xD0] = [0u8; 0xD0];
+static mut plugin_module_runtime: [u8; 0xD0] = [0u8; 0xD0];
 
 global_asm!(
     r#"
     .section ".text.crt0","ax"
     .global plugin_start
     .extern plugin_module_runtime
+    .hidden plugin_module_runtime
 
     plugin_start:
         .word 0
         .word plugin_mod0 - plugin_start
+        /* bytes 0x08-0x7F are overwritten by elf2nro32 with NroStart padding + NroHeader.
+           Reserve 0x78 bytes so all real code is placed at VMA >= 0x80. */
+        .space 0x78
 
     .section ".rodata.mod0"
     .global plugin_mod0
