@@ -1,8 +1,11 @@
 mod util;
 
-pub use log::{debug, error, info, trace, warn};
 use sys::log::Level as SysLevel;
 use sys::log::{forge_log, forge_log_getLevel};
+
+pub mod prelude {
+    pub use log::{debug, error, info, trace, warn};
+}
 
 use core::fmt::Write;
 use util::FixedCStringWriter;
