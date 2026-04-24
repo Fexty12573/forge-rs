@@ -14,3 +14,6 @@ mod allocator;
 pub mod log;
 pub mod mem;
 pub mod patch;
+
+#[cfg(feature = "patterns")]
+pub mod pattern;
