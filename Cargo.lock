@@ -60,7 +60,7 @@ checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
 name = "cargo-mhgu-forge"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -156,7 +156,7 @@ checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
 name = "mhgu-forge"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "log",
  "mhgu-forge-macros",
@@ -166,7 +166,7 @@ dependencies = [
 
 [[package]]
 name = "mhgu-forge-macros"
-version = "0.1.0"
+version = "0.2.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -175,11 +175,11 @@ dependencies = [
 
 [[package]]
 name = "mhgu-forge-rt"
-version = "0.1.0"
+version = "0.2.1"
 
 [[package]]
 name = "mhgu-forge-sys"
-version = "0.1.0"
+version = "0.2.1"
 
 [[package]]
 name = "once_cell_polyfill"

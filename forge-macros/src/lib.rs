@@ -21,7 +21,10 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #inner
 
         #[unsafe(no_mangle)]
-        pub extern "C" fn forge_onLoad() {
+        pub extern "C" fn forge_onLoad(params: *mut ::forge::sys::init::PluginInitParams) {
+            unsafe {
+                (*params).required_version = ::forge::REQUIRED_VERSION;
+            }
             #inner_name();
         }
     };

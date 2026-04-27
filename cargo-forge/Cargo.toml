@@ -1,10 +1,10 @@
 [package]
 name = "cargo-mhgu-forge"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
 description = "cargo subcommand for initializing and building MHGU forge plugins"
-license = "MIT"
-repository = "https://github.com/Fexty12573/forge-rs"
+license.workspace = true
+repository.workspace = true
 keywords = ["forge", "nro", "switch", "mhgu", "cargo-subcommand"]
 categories = ["game-engines", "development-tools"]
 

@@ -1,10 +1,10 @@
 [package]
 name = "mhgu-forge-rt"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
 description = "NRO runtime startup (MOD0 Header, init/fini, etc.) for forge plugins"
-license = "MIT"
-repository = "https://github.com/Fexty12573/forge-rs"
+license.workspace = true
+repository.workspace = true
 keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
 categories = ["no-std", "game-engines", "embedded"]
 

@@ -1,10 +1,10 @@
 [package]
 name = "mhgu-forge-macros"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
 description = "Procedural macros for forge plugins"
-license = "MIT"
-repository = "https://github.com/TODO/forge-rs"
+license.workspace = true
+repository.workspace = true
 keywords = ["forge", "nro", "switch", "mhgu", "macros"]
 categories = ["no-std", "game-engines"]
 
