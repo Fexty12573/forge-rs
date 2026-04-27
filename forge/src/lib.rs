@@ -3,11 +3,11 @@
 #[cfg(feature = "allocator")]
 extern crate alloc;
 
+pub extern crate forge_macros as macros;
 pub extern crate forge_rt as rt;
 pub extern crate forge_sys as sys;
 
-pub use forge_macros::entry;
-pub use forge_macros::hook;
+pub use macros::*;
 
 pub use sys::init::{ForgeVersion, PluginInitParams};
 
@@ -24,3 +24,6 @@ pub mod patch;
 
 #[cfg(feature = "patterns")]
 pub mod pattern;
+
+// #[cfg(feature = "mt")]
+pub mod mt;

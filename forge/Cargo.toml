@@ -16,6 +16,7 @@ path = "src/lib.rs"
 default = []
 allocator = []
 patterns = ["allocator"]
+mt = []
 
 [dependencies]
 mhgu-forge-sys = { path = "../forge-sys" }

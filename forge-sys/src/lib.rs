@@ -1,5 +1,6 @@
 #![no_std]
 
+pub mod cpp;
 pub mod hook;
 pub mod init;
 pub mod log;

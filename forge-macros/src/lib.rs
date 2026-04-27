@@ -1,7 +1,26 @@
+use crate::{
+    hook::{HookArgs, HookTransformer},
+    pure_virtual::{PureVirtualFn, VirtualArgs},
+};
 use proc_macro::TokenStream;
+use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{Expr, FnArg, ItemFn, LitInt, Token, parse::ParseStream, parse_macro_input, visit_mut::VisitMut};
+use syn::{DeriveInput, FnArg, ItemFn, parse_macro_input, visit_mut::VisitMut};
+
+fn forge_crate() -> TokenStream2 {
+    match crate_name("mhgu-forge") {
+        Ok(FoundCrate::Itself) => quote! { crate },
+        Ok(FoundCrate::Name(name)) => {
+            let ident = syn::Ident::new(&name, proc_macro2::Span::call_site());
+            quote! { ::#ident }
+        }
+        Err(_) => quote! { ::forge },
+    }
+}
+
+mod hook;
+mod pure_virtual;
 
 /// Marks a function as the plugins entry point.
 ///
@@ -30,78 +49,6 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     expanded.into()
-}
-
-struct HookArgs {
-    offset: LitInt,
-}
-
-impl syn::parse::Parse for HookArgs {
-    fn parse(input: ParseStream) -> syn::Result<Self> {
-        let ident: syn::Ident = input.parse()?;
-        if ident != "offset" {
-            return Err(syn::Error::new(ident.span(), "expected `offset`"));
-        }
-        let _: Token![=] = input.parse()?;
-        let offset: LitInt = input.parse()?;
-        Ok(HookArgs { offset })
-    }
-}
-
-/// Transforms `original!(args)` -> `__forge_original(args)` and
-/// `context!(T)` -> `&mut *(__forge_context as *mut T)` in hook bodies.
-struct HookTransformer;
-
-impl VisitMut for HookTransformer {
-    fn visit_stmt_mut(&mut self, stmt: &mut syn::Stmt) {
-        if let syn::Stmt::Macro(stmt_mac) = stmt {
-            let is_magic = stmt_mac.mac.path.is_ident("original")
-                || stmt_mac.mac.path.is_ident("original_function")
-                || stmt_mac.mac.path.is_ident("context");
-            if is_magic {
-                let semi = stmt_mac.semi_token;
-                let as_expr = syn::Expr::Macro(syn::ExprMacro {
-                    attrs: stmt_mac.attrs.clone(),
-                    mac: stmt_mac.mac.clone(),
-                });
-                *stmt = syn::Stmt::Expr(as_expr, semi);
-            }
-        }
-        syn::visit_mut::visit_stmt_mut(self, stmt);
-    }
-
-    fn visit_expr_mut(&mut self, expr: &mut Expr) {
-        if let Expr::Macro(expr_mac) = &*expr {
-            let mac = &expr_mac.mac;
-
-            if mac.path.is_ident("original") {
-                // original!() or original!(args) -> call original
-                let tokens = mac.tokens.clone();
-                *expr = syn::parse_quote!(__forge_original(#tokens));
-                return;
-            }
-
-            if mac.path.is_ident("original_function") {
-                // original_function!() -> raw function pointer
-                *expr = syn::parse_quote!(__forge_original);
-                return;
-            }
-
-            if mac.path.is_ident("context") {
-                let tokens = mac.tokens.clone();
-                if tokens.is_empty() {
-                    // context!() -> raw *const c_void
-                    *expr = syn::parse_quote!(__forge_context);
-                } else {
-                    // context!(SomeType) -> &mut SomeType
-                    *expr = syn::parse_quote!(unsafe { &mut *(__forge_context as *mut #tokens) });
-                }
-                return;
-            }
-        }
-
-        syn::visit_mut::visit_expr_mut(self, expr);
-    }
 }
 
 /// Defines a function hook at a fixed offset from a base address.
@@ -222,6 +169,106 @@ pub fn hook(attr: TokenStream, item: TokenStream) -> TokenStream {
                         ctx,
                     );
                     debug_assert_eq!(result, 0, "forge_hook_updateContext failed");
+                }
+            }
+        }
+    };
+
+    expanded.into()
+}
+
+/// Marks a method as a virtual function at a given index in the vtable.
+/// Methods marked with this must be part of a type that implements `HasVtable`, and must take `&self` or `&mut self` as the first parameter.
+/// The method body is replaced with a call to the function pointer at the specified index in the vtable
+///
+/// ### Example
+/// ```ignore
+/// #[derive(forge::HasVtable)]
+/// pub struct MyStruct;
+///
+/// impl MyStruct {
+///     #[forge::pure_virtual(3)]
+///     pub fn my_virtual_func(&self) -> i32 {}
+/// }
+/// ```
+/// Note the lack of an actual implementation of the function.
+#[proc_macro_attribute]
+pub fn pure_virtual(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let args = parse_macro_input!(attr as VirtualArgs);
+    let func = parse_macro_input!(item as PureVirtualFn);
+
+    let func_name = &func.sig.ident;
+    let inputs = &func.sig.inputs;
+    let output = &func.sig.output;
+
+    let has_self = !inputs.is_empty()
+        && match &inputs[0] {
+            FnArg::Receiver(receiver) => receiver.reference.is_some(),
+            _ => false,
+        };
+
+    if !has_self {
+        panic!("Functions marked with #[forge::pure_virtual] must have `&self` as their first parameter");
+    }
+
+    let param_types: Vec<TokenStream2> = inputs
+        .iter()
+        .map(|arg| match arg {
+            FnArg::Receiver(receiver) => {
+                let ty = &receiver.ty;
+                quote! { #ty }
+            }
+            FnArg::Typed(pat_type) => {
+                let ty = &pat_type.ty;
+                quote! { #ty }
+            }
+        })
+        .collect();
+
+    let ret_type = match output {
+        syn::ReturnType::Default => quote! { () },
+        syn::ReturnType::Type(_, ty) => quote! { #ty },
+    };
+
+    let fn_ptr_type = quote! { unsafe extern "C" fn(#(#param_types),*) -> #ret_type };
+
+    let index = &args.index;
+    let param_names: Vec<TokenStream2> = inputs
+        .iter()
+        .map(|arg| match arg {
+            FnArg::Receiver(_) => quote! { self },
+            FnArg::Typed(pat_type) => {
+                let pat = &pat_type.pat;
+                quote! { #pat }
+            }
+        })
+        .collect();
+
+    let forge = forge_crate();
+    let expanded = quote! {
+        pub fn #func_name(#inputs) #output {
+            let func: #fn_ptr_type = unsafe {
+                ::core::mem::transmute(#forge::sys::cpp::HasVtable::vtable_ptr(self).add(#index))
+            };
+            unsafe { func(#(#param_names),*) }
+        }
+    };
+
+    expanded.into()
+}
+
+#[proc_macro_derive(HasVtable)]
+pub fn has_vtable_derive(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let type_name = &input.ident;
+    let forge = forge_crate();
+
+    let expanded = quote! {
+        impl #forge::sys::cpp::HasVtable for #type_name {
+            fn vtable_ptr(&self) -> *const *const ::core::ffi::c_void {
+                unsafe {
+                    let ptr = self as *const Self as *const *const *const ::core::ffi::c_void;
+                    *ptr
                 }
             }
         }
