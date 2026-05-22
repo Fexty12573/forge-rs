@@ -12,9 +12,9 @@ pub trait Object: HasVtable {
         unsafe { func(self) }
     }
 
-    fn destroy(&mut self) {
-        let func: unsafe extern "C" fn(&mut Self) = unsafe { transmute(self.vtable_ptr().add(1)) };
-        unsafe { func(self) }
+    fn destroy(&mut self, deallocate: bool) {
+        let func: unsafe extern "C" fn(&mut Self, bool) = unsafe { transmute(self.vtable_ptr().add(1)) };
+        unsafe { func(self, deallocate) }
     }
 
     fn create_ui(&self) {

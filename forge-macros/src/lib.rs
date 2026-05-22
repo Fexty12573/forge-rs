@@ -298,3 +298,31 @@ pub fn mt_object_derive(input: TokenStream) -> TokenStream {
 
     expanded.into()
 }
+
+#[proc_macro_derive(CacheDti)]
+pub fn cache_dti_derive(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let type_name = &input.ident;
+    let forge = forge_crate();
+
+    let expanded = quote! {
+        impl #forge::mt::dti::CacheDti for #type_name {
+            fn dti() -> Option<&'static #forge::mt::dti::MtDti> {
+                static DTI: core::sync::atomic::AtomicPtr<#forge::mt::dti::MtDti> = core::sync::atomic::AtomicPtr::new(core::ptr::null_mut());
+                let mut ptr = DTI.load(core::sync::atomic::Ordering::Relaxed);
+                if ptr.is_null() {
+                    ptr = #forge::mt::dti::MtDti::find("#type_name").map_or(core::ptr::null_mut(), |d| d as *const _ as *mut _);
+                    DTI.store(ptr, core::sync::atomic::Ordering::Relaxed);
+                }
+
+                if ptr.is_null() {
+                    None
+                } else {
+                    Some(unsafe { &*ptr })
+                }
+            }
+        }
+    };
+
+    expanded.into()
+}

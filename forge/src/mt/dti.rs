@@ -1,7 +1,10 @@
 use core::ffi::{CStr, c_char, c_void};
 
-use crate::mt::crc::MtCRC;
+use macros::{HasVtable, pure_virtual};
 
+use crate::mt::{crc::MtCRC, object::Object};
+
+#[derive(HasVtable)]
 pub struct MtDti {
     _vft: *const c_void,
     name: *const c_char,
@@ -11,6 +14,10 @@ pub struct MtDti {
     link: *const MtDti,
     meta: u32,
     id: u32,
+}
+
+pub trait CacheDti {
+    fn dti() -> Option<&'static MtDti>;
 }
 
 impl MtDti {
@@ -29,6 +36,22 @@ impl MtDti {
         } else {
             Some(unsafe { &*dti })
         }
+    }
+
+    pub fn new<T: Object>(&self) -> Option<&mut T> {
+        unsafe {
+            let ptr = self.new_instance_impl();
+            if ptr != core::ptr::null_mut() {
+                Some(&mut *(ptr as *mut T))
+            } else {
+                None
+            }
+        }
+    }
+
+    pub fn instantiate<T: Object>(&self, obj: &mut T) -> bool {
+        let ptr = self.instantiate_impl(core::ptr::from_mut(obj) as *mut c_void);
+        ptr != core::ptr::null_mut()
     }
 
     pub fn name(&self) -> &str {
@@ -101,4 +124,17 @@ impl MtDti {
     pub fn is_a_str(&self, other_name: &str) -> bool {
         self.is_a(Self::make_id(other_name))
     }
+
+    // Virtual Functions
+    #[pure_virtual(0)]
+    fn dtor(&mut self);
+
+    #[pure_virtual(1)]
+    fn new_instance_impl(&self) -> *mut c_void;
+
+    #[pure_virtual(2)]
+    fn instantiate_impl(&self, obj: *mut c_void) -> *mut c_void;
+
+    #[pure_virtual(3)]
+    fn instantiate_array_impl(&self, objs: *mut c_void, count: i64) -> *mut c_void;
 }
