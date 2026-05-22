@@ -276,3 +276,25 @@ pub fn has_vtable_derive(input: TokenStream) -> TokenStream {
 
     expanded.into()
 }
+
+#[proc_macro_derive(Object)]
+pub fn mt_object_derive(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let type_name = &input.ident;
+    let forge = forge_crate();
+
+    let expanded = quote! {
+        impl #forge::sys::cpp::HasVtable for #type_name {
+            fn vtable_ptr(&self) -> *const *const ::core::ffi::c_void {
+                unsafe {
+                    let ptr = self as *const Self as *const *const *const ::core::ffi::c_void;
+                    *ptr
+                }
+            }
+        }
+
+        impl #forge::mt::object::Object for #type_name {}
+    };
+
+    expanded.into()
+}

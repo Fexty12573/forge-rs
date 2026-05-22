@@ -1,27 +1,39 @@
-use core::ffi::c_void;
+use core::{ffi::c_void, mem::transmute};
 
-use crate::HasVtable;
-use macros::pure_virtual;
+use macros::Object;
+use sys::cpp::HasVtable;
 
-#[derive(HasVtable)]
+#[derive(Object)]
 pub struct MtObject;
 
-impl MtObject {
-    #[pure_virtual(0)]
-    pub fn dtor(&mut self) {}
+pub trait Object: HasVtable {
+    fn dtor(&mut self) {
+        let func: unsafe extern "C" fn(&mut Self) = unsafe { transmute(self.vtable_ptr().add(0)) };
+        unsafe { func(self) }
+    }
 
-    #[pure_virtual(1)]
-    pub fn destroy(&mut self) {}
+    fn destroy(&mut self) {
+        let func: unsafe extern "C" fn(&mut Self) = unsafe { transmute(self.vtable_ptr().add(1)) };
+        unsafe { func(self) }
+    }
 
-    #[pure_virtual(2)]
-    pub fn create_ui(&self) {}
+    fn create_ui(&self) {
+        let func: unsafe extern "C" fn(&Self) = unsafe { transmute(self.vtable_ptr().add(2)) };
+        unsafe { func(self) }
+    }
 
-    #[pure_virtual(3)]
-    pub fn is_enable_instance(&self) -> bool {}
+    fn is_enable_instance(&self) -> bool {
+        let func: unsafe extern "C" fn(&Self) -> bool = unsafe { transmute(self.vtable_ptr().add(3)) };
+        unsafe { func(self) }
+    }
 
-    #[pure_virtual(4)]
-    pub fn create_property(&self, props: *const c_void) {}
+    fn create_property(&self, props: *const c_void) {
+        let func: unsafe extern "C" fn(&Self, *const c_void) = unsafe { transmute(self.vtable_ptr().add(4)) };
+        unsafe { func(self, props) }
+    }
 
-    #[pure_virtual(5)]
-    pub fn get_dti(&self) -> *const c_void {}
+    fn get_dti(&self) -> *const c_void {
+        let func: unsafe extern "C" fn(&Self) -> *const c_void = unsafe { transmute(self.vtable_ptr().add(5)) };
+        unsafe { func(self) }
+    }
 }
