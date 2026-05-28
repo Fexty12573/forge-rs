@@ -2,7 +2,10 @@ use core::fmt::Write;
 
 use macros::{CacheDti, Object, pure_virtual};
 
-use crate::mt::dti::CacheDti;
+use crate::mt::{
+    dti::CacheDti,
+    error::{MtError, MtResult},
+};
 
 #[derive(Object, CacheDti)]
 pub struct MtFile;
@@ -26,10 +29,12 @@ pub enum Origin {
 }
 
 impl MtFile {
-    pub fn open(path: &str, mode: OpenMode) -> Option<&mut Self> {
-        let file: &mut MtFile = Self::dti()?.new()?;
+    pub fn open(path: &str, mode: OpenMode) -> MtResult<&mut Self> {
+        let dti = Self::dti().ok_or(MtError::DtiNotFound("MtFile"))?;
+        let file: &mut MtFile = dti.new().ok_or(MtError::FailedToCreateInstance("MtFile"))?;
+
         let success = file.open_impl(path.as_ptr(), mode as i32, false);
-        if success { Some(file) } else { None }
+        if success { Ok(file) } else { Err(MtError::FailedToOpenFile) }
     }
 
     pub fn read(&mut self, buffer: &mut [u8]) -> usize {

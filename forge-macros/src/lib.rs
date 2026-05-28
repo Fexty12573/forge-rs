@@ -6,7 +6,7 @@ use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{DeriveInput, FnArg, ItemFn, parse_macro_input, visit_mut::VisitMut};
+use syn::{DeriveInput, FnArg, ItemFn, Visibility, parse_macro_input, visit_mut::VisitMut};
 
 fn forge_crate() -> TokenStream2 {
     match crate_name("mhgu-forge") {
@@ -200,6 +200,7 @@ pub fn pure_virtual(attr: TokenStream, item: TokenStream) -> TokenStream {
     let func_name = &func.sig.ident;
     let inputs = &func.sig.inputs;
     let output = &func.sig.output;
+    let visibility = &func.vis;
 
     let has_self = !inputs.is_empty()
         && match &inputs[0] {
@@ -246,9 +247,11 @@ pub fn pure_virtual(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let forge = forge_crate();
     let expanded = quote! {
-        pub fn #func_name(#inputs) #output {
+        #visibility fn #func_name(#inputs) #output {
+            let vtable = #forge::sys::cpp::HasVtable::vtable_ptr(self);
+            let addr = unsafe { #forge::sys::cpp::HasVtable::get_virtual_function(self, #index) };
             let func: #fn_ptr_type = unsafe {
-                ::core::mem::transmute(#forge::sys::cpp::HasVtable::vtable_ptr(self).add(#index))
+                ::core::mem::transmute(addr)
             };
             unsafe { func(#(#param_names),*) }
         }
@@ -303,6 +306,7 @@ pub fn mt_object_derive(input: TokenStream) -> TokenStream {
 pub fn cache_dti_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let type_name = &input.ident;
+    let type_name_str = type_name.to_string();
     let forge = forge_crate();
 
     let expanded = quote! {
@@ -311,7 +315,7 @@ pub fn cache_dti_derive(input: TokenStream) -> TokenStream {
                 static DTI: core::sync::atomic::AtomicPtr<#forge::mt::dti::MtDti> = core::sync::atomic::AtomicPtr::new(core::ptr::null_mut());
                 let mut ptr = DTI.load(core::sync::atomic::Ordering::Relaxed);
                 if ptr.is_null() {
-                    ptr = #forge::mt::dti::MtDti::find("#type_name").map_or(core::ptr::null_mut(), |d| d as *const _ as *mut _);
+                    ptr = #forge::mt::dti::MtDti::find(#type_name_str).map_or(core::ptr::null_mut(), |d| d as *const _ as *mut _);
                     DTI.store(ptr, core::sync::atomic::Ordering::Relaxed);
                 }
 

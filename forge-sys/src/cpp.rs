@@ -11,4 +11,8 @@ use core::ffi::c_void;
 /// ```
 pub trait HasVtable {
     fn vtable_ptr(&self) -> *const *const c_void;
+
+    fn get_virtual_function(&self, index: usize) -> *const c_void {
+        unsafe { *self.vtable_ptr().add(index) }
+    }
 }

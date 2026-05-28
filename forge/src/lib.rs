@@ -21,9 +21,10 @@ pub mod hook;
 pub mod log;
 pub mod mem;
 pub mod patch;
+pub mod socket;
 
 #[cfg(feature = "patterns")]
 pub mod pattern;
 
-// #[cfg(feature = "mt")]
+#[cfg(feature = "mt")]
 pub mod mt;

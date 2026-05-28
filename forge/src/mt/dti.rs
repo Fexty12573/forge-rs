@@ -130,11 +130,14 @@ impl MtDti {
     fn dtor(&mut self);
 
     #[pure_virtual(1)]
-    fn new_instance_impl(&self) -> *mut c_void;
+    fn dtor2(&mut self);
 
     #[pure_virtual(2)]
-    fn instantiate_impl(&self, obj: *mut c_void) -> *mut c_void;
+    fn new_instance_impl(&self) -> *mut c_void;
 
     #[pure_virtual(3)]
+    fn instantiate_impl(&self, obj: *mut c_void) -> *mut c_void;
+
+    #[pure_virtual(4)]
     fn instantiate_array_impl(&self, objs: *mut c_void, count: i64) -> *mut c_void;
 }

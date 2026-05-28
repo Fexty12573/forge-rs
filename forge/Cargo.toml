@@ -13,7 +13,7 @@ name = "forge"
 path = "src/lib.rs"
 
 [features]
-default = []
+default = ["mt"]
 allocator = []
 patterns = ["allocator"]
 mt = []

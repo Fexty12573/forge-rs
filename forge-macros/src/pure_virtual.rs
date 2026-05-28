@@ -1,20 +1,21 @@
 use syn::{Ident, LitInt, Token, parse::ParseStream};
 
 pub struct PureVirtualFn {
+    pub(crate) vis: syn::Visibility,
     pub(crate) sig: syn::Signature,
 }
 
 impl syn::parse::Parse for PureVirtualFn {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         syn::Attribute::parse_outer(input)?;
-        let _vis: syn::Visibility = input.parse()?;
+        let vis: syn::Visibility = input.parse()?;
         let sig: syn::Signature = input.parse()?;
         if input.peek(Token![;]) {
             let _: Token![;] = input.parse()?;
         } else {
             let _body: syn::Block = input.parse()?;
         }
-        Ok(PureVirtualFn { sig })
+        Ok(PureVirtualFn { vis, sig })
     }
 }
 
