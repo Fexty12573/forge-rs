@@ -4,6 +4,7 @@ use macros::{HasVtable, pure_virtual};
 
 use crate::mt::{crc::MtCRC, object::Object};
 
+#[repr(C)]
 #[derive(HasVtable)]
 pub struct MtDti {
     _vft: *const c_void,
