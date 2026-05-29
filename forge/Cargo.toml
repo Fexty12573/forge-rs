@@ -20,6 +20,6 @@ mt = []
 
 [dependencies]
 mhgu-forge-sys = { path = "../forge-sys" }
-mhgu-forge-rt = { path = "../forge-rt" }
+mhgu-forge-rt = { path = "../forge-rt", features = ["logging"] }
 mhgu-forge-macros = { path = "../forge-macros" }
 log = { version = "0.4", default-features = false }

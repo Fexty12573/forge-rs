@@ -5,6 +5,9 @@ use core::arch::global_asm;
 #[cfg(not(test))]
 use core::panic::PanicInfo;
 
+#[cfg(feature = "logging")]
+mod fmt;
+
 #[used]
 #[unsafe(no_mangle)]
 #[unsafe(link_section = ".bss")]
@@ -45,6 +48,34 @@ pub extern "C" fn fini() {}
 
 #[cfg(not(test))]
 #[panic_handler]
-fn forge_panic(_info: &PanicInfo) -> ! {
+fn forge_panic(info: &PanicInfo) -> ! {
+    #[cfg(feature = "logging")]
+    {
+        use core::fmt::Write;
+        use fmt::FixedCStringWriter;
+        use forge_sys::log::{Level, forge_log};
+
+        const FMT: &[u8; 3] = b"%s\0";
+
+        let mut buf = [0u8; 512];
+        let mut writer = FixedCStringWriter::new(&mut buf);
+
+        if let Some(loc) = info.location() {
+            let _ = write!(
+                writer,
+                "PANIC at '{}' ({}:{}:{})",
+                info.message(),
+                loc.file(),
+                loc.line(),
+                loc.column()
+            );
+        } else {
+            let _ = write!(writer, "PANIC: {}", info.message());
+        }
+
+        unsafe {
+            forge_log(Level::Error, FMT.as_ptr().cast(), writer.as_c_str_ptr());
+        }
+    }
     loop {}
 }

@@ -8,6 +8,12 @@ repository.workspace = true
 keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
 categories = ["no-std", "game-engines", "embedded"]
 
+[features]
+logging = ["dep:mhgu-forge-sys"]
+
+[dependencies]
+mhgu-forge-sys = { path = "../forge-sys", optional = true }
+
 [lib]
 name = "forge_rt"
 path = "src/lib.rs"
