@@ -28,3 +28,6 @@ pub mod pattern;
 
 #[cfg(feature = "mt")]
 pub mod mt;
+
+#[cfg(feature = "mt")]
+pub mod singleton;

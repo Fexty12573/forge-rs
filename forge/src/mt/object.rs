@@ -1,6 +1,5 @@
 use core::{ffi::c_void, mem::transmute};
 
-use log::info;
 use macros::Object;
 use sys::cpp::HasVtable;
 

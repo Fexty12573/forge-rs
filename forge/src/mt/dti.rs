@@ -26,7 +26,7 @@ impl MtDti {
         MtCRC::from_str(name, 0xFFFFFFFF) & 0x7FFFFFFF
     }
 
-    pub fn find(name: &str) -> Option<&MtDti> {
+    pub fn find(name: &str) -> Option<&'static MtDti> {
         type FindDtiFunc = unsafe extern "C" fn(u32) -> *const MtDti;
         let addr = crate::mem::text_addr() + 0x7AEF68;
         let func: FindDtiFunc = unsafe { core::mem::transmute(addr as *const c_void) };
@@ -39,7 +39,7 @@ impl MtDti {
         }
     }
 
-    pub fn new<T: Object>(&self) -> Option<&mut T> {
+    pub fn new<T: Object>(&self) -> Option<&'static mut T> {
         unsafe {
             let ptr = self.new_instance_impl();
             if ptr != core::ptr::null_mut() {

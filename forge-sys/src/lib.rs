@@ -7,4 +7,5 @@ pub mod log;
 pub mod mem;
 pub mod patch;
 pub mod pattern;
+pub mod singleton;
 pub mod socket;
