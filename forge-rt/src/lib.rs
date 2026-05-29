@@ -5,6 +5,7 @@ use core::arch::global_asm;
 #[cfg(not(test))]
 use core::panic::PanicInfo;
 
+#[cfg(not(test))]
 #[cfg(feature = "logging")]
 mod fmt;
 

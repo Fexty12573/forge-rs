@@ -1,6 +1,5 @@
 use alloc::{boxed::Box, ffi::CString, vec::Vec};
 
-use log::error;
 use sys::singleton::*;
 
 use crate::mt::object::{MtObject, Object};
@@ -41,9 +40,14 @@ impl SingletonManager {
         let count = unsafe { forge_singleton_getAllInstances(core::ptr::null_mut(), 0) };
         let mut instances = Vec::with_capacity(count as usize);
 
-        let actual = unsafe { forge_singleton_getAllInstances(instances.as_mut_ptr(), count) };
+        let actual = unsafe {
+            let n = forge_singleton_getAllInstances(instances.as_mut_ptr(), count);
+            instances.set_len(n as usize);
+            n
+        };
+
         if actual != count {
-            error!("Mismatching singleton count. Expected {count} got {actual}");
+            log::error!("Mismatching singleton count. Expected {count} got {actual}");
         }
 
         instances

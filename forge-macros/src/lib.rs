@@ -6,7 +6,7 @@ use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{DeriveInput, FnArg, ItemFn, Visibility, parse_macro_input, visit_mut::VisitMut};
+use syn::{DeriveInput, FnArg, ItemFn, parse_macro_input, visit_mut::VisitMut};
 
 fn forge_crate() -> TokenStream2 {
     match crate_name("mhgu-forge") {
@@ -37,6 +37,7 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let inner_name = &inner.sig.ident;
 
     let expanded = quote! {
+        #[inline(always)]
         #inner
 
         #[unsafe(no_mangle)]
@@ -44,6 +45,10 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
             unsafe {
                 (*params).required_version = ::forge::REQUIRED_VERSION;
             }
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn forge_onInit(params: *mut ::forge::sys::init::PluginInitParams) {
             #inner_name();
         }
     };
