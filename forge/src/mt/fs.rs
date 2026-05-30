@@ -9,8 +9,8 @@ use crate::mt::{
 
 /// MT Framework's file stream class (`MtFile`).
 ///
-/// Wraps a game-side file object, exposing its I/O operations — open, read,
-/// write, seek and the various size/position queries — through the underlying
+/// Wraps a game-side file object, exposing its I/O operations - open, read,
+/// write, seek and the various size/position queries - through the underlying
 /// vtable. Instances are created through the game's own factory (see
 /// [`open`](Self::open)), which is why the type derives
 /// [`CacheDti`](macros::CacheDti) to locate its [`MtDti`](crate::mt::dti::MtDti).

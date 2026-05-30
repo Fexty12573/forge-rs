@@ -63,11 +63,11 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// hook's static state and can be installed via `forge::install_hook!`.
 ///
 /// Inside the body the following pseudo-macros are available:
-/// - `original!(args)` — call the original function (zero or more args).
-/// - `original!()` — call the original function with no arguments.
-/// - `original_function!()` — obtain the raw function pointer without calling it.
-/// - `context!(T)` — borrow the context as `&mut T` (requires context variant of install).
-/// - `context!()` — obtain the raw `*const c_void` context pointer.
+/// - `original!(args)` - call the original function (zero or more args).
+/// - `original!()` - call the original function with no arguments.
+/// - `original_function!()` - obtain the raw function pointer without calling it.
+/// - `context!(T)` - borrow the context as `&mut T` (requires context variant of install).
+/// - `context!()` - obtain the raw `*const c_void` context pointer.
 ///
 /// ### Example
 /// ```ignore

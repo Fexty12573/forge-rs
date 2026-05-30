@@ -8,7 +8,7 @@ use crate::mt::{dti::MtDti, property_list::MtPropertyList};
 /// The root class of MT Framework's object system (`MtObject`).
 ///
 /// Nearly every game class derives from `MtObject`; it provides the reflection
-/// machinery shared by all of them — a link to the class's [`MtDti`] and the
+/// machinery shared by all of them - a link to the class's [`MtDti`] and the
 /// ability to enumerate its reflected properties as an [`MtPropertyList`]. The
 /// shared virtual-function behaviour (destructors, construction, property
 /// creation, DTI access) lives in the [`Object`] trait, which this type
