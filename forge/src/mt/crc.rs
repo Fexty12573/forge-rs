@@ -1,3 +1,4 @@
+#[cfg(target_arch = "arm")]
 use core::arch::naked_asm;
 
 /// Offers CRC32 hashing functionality, equivalent to that used by the game.
@@ -46,6 +47,7 @@ impl MtCRC {
     ///
     /// [`from_bytes`]: Self::from_bytes
     /// [`from_str`]: Self::from_str
+    #[cfg(target_arch = "arm")]
     #[unsafe(naked)]
     pub unsafe extern "C" fn get_raw(ptr: *const u8, len: usize, crc: u32) -> u32 {
         // arch and extension declarations required for the crc32b instruction
@@ -66,5 +68,13 @@ impl MtCRC {
             bx lr
         "#
         );
+    }
+
+    /// Stub for non-ARM hosts so the crate compiles off-target.
+    /// This crate only ever runs on the game's ARM target, where the [`naked_asm`]
+    /// implementation above is used instead.
+    #[cfg(not(target_arch = "arm"))]
+    pub unsafe extern "C" fn get_raw(_ptr: *const u8, _len: usize, crc: u32) -> u32 {
+        crc
     }
 }
