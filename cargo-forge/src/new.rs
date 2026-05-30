@@ -49,6 +49,9 @@ edition = "2024"
 
 [lib]
 crate-type = ["cdylib"]
+test = false
+doctest = false
+bench = false
 
 [dependencies]
 mhgu-forge = "{FORGE_VERSION}"
