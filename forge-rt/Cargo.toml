@@ -12,7 +12,7 @@ categories = ["no-std", "game-engines", "embedded"]
 logging = ["dep:mhgu-forge-sys"]
 
 [dependencies]
-mhgu-forge-sys = { path = "../forge-sys", optional = true }
+mhgu-forge-sys = { workspace = true, optional = true }
 
 [lib]
 name = "forge_rt"

@@ -19,7 +19,7 @@ patterns = ["allocator"]
 mt = ["allocator"]
 
 [dependencies]
-mhgu-forge-sys = { path = "../forge-sys" }
-mhgu-forge-rt = { path = "../forge-rt", features = ["logging"] }
-mhgu-forge-macros = { path = "../forge-macros" }
+mhgu-forge-sys = { workspace = true }
+mhgu-forge-rt = { workspace = true, features = ["logging"] }
+mhgu-forge-macros = { workspace = true }
 log = { version = "0.4", default-features = false }
