@@ -3,13 +3,13 @@ resolver = "3"
 members = ["forge-rt", "cargo-forge", "forge-macros", "forge", "forge-sys"]
 
 [workspace.package]
-version = "0.4.3"
+version = "0.4.4"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/Fexty12573/forge-rs"
 
 [workspace.dependencies]
 # Bump these together with [workspace.package].version
-mhgu-forge-sys = { path = "forge-sys", version = "0.4.3" }
-mhgu-forge-rt = { path = "forge-rt", version = "0.4.3" }
-mhgu-forge-macros = { path = "forge-macros", version = "0.4.3" }
+mhgu-forge-sys = { path = "forge-sys", version = "0.4.4" }
+mhgu-forge-rt = { path = "forge-rt", version = "0.4.4" }
+mhgu-forge-macros = { path = "forge-macros", version = "0.4.4" }
