@@ -60,7 +60,7 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// Defines a function hook at a fixed offset from a base address.
 ///
 /// The annotated function becomes a module of the same name that holds the
-/// hook's static state and can be installed via [`forge::install_hook!`].
+/// hook's static state and can be installed via `forge::install_hook!`.
 ///
 /// Inside the body the following pseudo-macros are available:
 /// - `original!(args)` — call the original function (zero or more args).

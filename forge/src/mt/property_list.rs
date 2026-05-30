@@ -4,6 +4,21 @@ use macros::Object;
 
 use crate::{mem, mt::property::MtProperty};
 
+/// The list of [`MtProperty`] entries exposed by an [`MtObject`].
+///
+/// MT Framework reports an object's reflected properties by populating one of
+/// these lists (see [`MtObject::get_properties`]). The list itself only holds
+/// the head of the chain; the properties live in the game and are linked
+/// together through their [`next`](MtProperty::next) pointers. Iterate it (via
+/// [`iter`](Self::iter) or `for p in &list`) to walk those properties in order.
+///
+/// # Layout
+///
+/// `#[repr(C)]` so the fields match the game's in-memory layout exactly, since
+/// the game writes directly into a list created with [`new`](Self::new).
+///
+/// [`MtObject`]: crate::mt::object::MtObject
+/// [`MtObject::get_properties`]: crate::mt::object::MtObject::get_properties
 #[repr(C)]
 #[derive(Object)]
 pub struct MtPropertyList {
@@ -11,12 +26,22 @@ pub struct MtPropertyList {
     first: *const MtProperty,
 }
 
+/// Iterator over an [`MtPropertyList`], yielding each [`MtProperty`] from the
+/// head of the chain onward.
+///
+/// Created by [`MtPropertyList::iter`] or by iterating a `&MtPropertyList`.
 pub struct MtPropertyListIter<'a> {
     current: *const MtProperty,
     _phantom: PhantomData<&'a MtProperty>,
 }
 
 impl MtPropertyList {
+    /// Creates a new, empty property list.
+    ///
+    /// The list is initialised with the game's `MtPropertyList` vtable so it can
+    /// be handed to the game to be filled in (see
+    /// [`MtObject::get_properties`](crate::mt::object::MtObject::get_properties));
+    /// on its own it contains no properties.
     pub fn new() -> Self {
         Self {
             _vft: (mem::text_addr() + 0x177E9A0) as *const c_void,
@@ -24,6 +49,7 @@ impl MtPropertyList {
         }
     }
 
+    /// Returns the first property in the list, or `None` if the list is empty.
     pub fn first(&self) -> Option<&MtProperty> {
         if self.is_empty() {
             None
@@ -32,10 +58,14 @@ impl MtPropertyList {
         }
     }
 
+    /// Returns `true` if the list contains no properties.
     pub fn is_empty(&self) -> bool {
         self.first == core::ptr::null()
     }
 
+    /// Returns the number of properties in the list.
+    ///
+    /// This walks the whole chain, so it is `O(n)`.
     pub fn len(&self) -> usize {
         if self.is_empty() {
             return 0;
@@ -51,6 +81,7 @@ impl MtPropertyList {
         len
     }
 
+    /// Returns an iterator over the properties in the list, from first to last.
     pub fn iter(&self) -> MtPropertyListIter<'_> {
         MtPropertyListIter {
             current: self.first,
