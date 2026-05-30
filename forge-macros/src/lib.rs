@@ -49,6 +49,7 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
         #[unsafe(no_mangle)]
         pub extern "C" fn forge_onInit(params: *mut ::forge::sys::init::PluginInitParams) {
+            ::forge::log::init().expect("Failed to initialize logger");
             #inner_name();
         }
     };
