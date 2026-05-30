@@ -6,6 +6,7 @@ use clap::{Args, Parser, Subcommand};
 mod embedded;
 mod fbuild;
 mod new;
+mod nro;
 
 #[derive(Parser)]
 #[command(name = "cargo")]

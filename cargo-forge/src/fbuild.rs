@@ -56,18 +56,8 @@ pub fn build(release: bool) -> Result<()> {
 
     println!("Built ELF: {}", elf_path.display());
 
-    let elf2nro = locate_elf2nro()?;
     let nro_path = manifest_dir.join(format!("{package_name}.nro"));
-
-    let status = Command::new(&elf2nro)
-        .arg(&elf_path)
-        .arg(&nro_path)
-        .status()
-        .with_context(|| format!("failed to run {}", elf2nro.display()))?;
-
-    if !status.success() {
-        bail!("elf2nro32 failed");
-    }
+    crate::nro::convert(&elf_path, &nro_path)?;
 
     println!("Output NRO: {}", nro_path.display());
     Ok(())
@@ -90,22 +80,4 @@ fn find_elf(dir: &Path, crate_name: &str) -> Option<PathBuf> {
     }
 
     None
-}
-
-fn locate_elf2nro() -> Result<PathBuf> {
-    // Prefer explicit override
-    if let Ok(path) = std::env::var("ELF2NRO32") {
-        return Ok(PathBuf::from(path));
-    }
-
-    // Standard devkitPRO location
-    if let Ok(devkitpro) = std::env::var("DEVKITPRO") {
-        let p = PathBuf::from(devkitpro).join("tools").join("bin").join("elf2nro32");
-        if p.exists() {
-            return Ok(p);
-        }
-    }
-
-    // Fall back to PATH
-    Ok(PathBuf::from("elf2nro32"))
 }
