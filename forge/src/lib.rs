@@ -18,6 +18,7 @@ include!(concat!(env!("OUT_DIR"), "/version.rs"));
 mod allocator;
 
 pub mod hook;
+pub mod input;
 pub mod log;
 pub mod mem;
 pub mod patch;
