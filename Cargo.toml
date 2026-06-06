@@ -4,13 +4,13 @@ members = ["forge-rt", "cargo-forge", "forge-macros", "forge", "forge-sys"]
 exclude = ["tools/imgui-bindgen"]
 
 [workspace.package]
-version = "0.4.4"
+version = "1.1.1"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/Fexty12573/forge-rs"
 
 [workspace.dependencies]
 # Bump these together with [workspace.package].version
-mhgu-forge-sys = { path = "forge-sys", version = "0.4.4" }
-mhgu-forge-rt = { path = "forge-rt", version = "0.4.4" }
-mhgu-forge-macros = { path = "forge-macros", version = "0.4.4" }
+mhgu-forge-sys = { path = "forge-sys", version = "1.1.1" }
+mhgu-forge-rt = { path = "forge-rt", version = "1.1.1" }
+mhgu-forge-macros = { path = "forge-macros", version = "1.1.1" }
