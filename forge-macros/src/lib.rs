@@ -57,6 +57,63 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
     expanded.into()
 }
 
+/// Callback for rendering imgui UI in the main forge window
+///
+/// ### Example
+/// ```ignore
+/// #[forge::imgui_render]
+/// fn my_render() {
+///     // Your code here
+/// }
+/// ```
+#[cfg(feature = "imgui")]
+#[proc_macro_attribute]
+pub fn imgui_render(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let inner = parse_macro_input!(item as ItemFn);
+    let inner_name = &inner.sig.ident;
+
+    let expanded = quote! {
+        #[inline(always)]
+        #inner
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn forge_onImGuiRender() {
+            #inner_name();
+        }
+    };
+
+    expanded.into()
+}
+
+/// Callback for rendering imgui UI *outside* of the main forge window.
+/// **Requires** begin/end calls to draw.
+///
+/// ### Example
+/// ```ignore
+/// #[forge::imgui_free_render]
+/// fn my_free_render() {
+///     // Your code here
+/// }
+/// ```
+#[cfg(feature = "imgui")]
+#[proc_macro_attribute]
+pub fn imgui_free_render(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let inner = parse_macro_input!(item as ItemFn);
+    let inner_name = &inner.sig.ident;
+
+    let expanded = quote! {
+        #[inline(always)]
+        #inner
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn forge_onImGuiFreeRender() {
+            #inner_name();
+        }
+    };
+
+    expanded.into()
+}
+
 /// Defines a function hook at a fixed offset from a base address.
 ///
 /// The annotated function becomes a module of the same name that holds the
