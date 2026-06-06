@@ -19,3 +19,49 @@
 )]
 
 include!("imgui_bindings.rs");
+
+impl ImVec2 {
+    pub fn new(x: f32, y: f32) -> Self {
+        ImVec2 { x, y }
+    }
+}
+
+impl ImVec4 {
+    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Self {
+        Self { x, y, z, w }
+    }
+}
+
+impl From<(f32, f32)> for ImVec2 {
+    fn from(value: (f32, f32)) -> Self {
+        Self { x: value.0, y: value.1 }
+    }
+}
+
+impl From<(f32, f32, f32, f32)> for ImVec4 {
+    fn from(value: (f32, f32, f32, f32)) -> Self {
+        Self {
+            x: value.0,
+            y: value.1,
+            z: value.2,
+            w: value.3,
+        }
+    }
+}
+
+impl Default for ImVec2 {
+    fn default() -> Self {
+        Self { x: 0.0, y: 0.0 }
+    }
+}
+
+impl Default for ImVec4 {
+    fn default() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            w: 0.0,
+        }
+    }
+}

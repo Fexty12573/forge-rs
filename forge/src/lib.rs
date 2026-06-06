@@ -35,3 +35,6 @@ pub mod singleton;
 
 #[cfg(feature = "imgui")]
 pub mod graphics;
+
+#[cfg(feature = "imgui")]
+pub mod imgui;
