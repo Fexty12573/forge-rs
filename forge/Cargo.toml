@@ -17,6 +17,7 @@ default = ["mt"]
 allocator = []
 patterns = ["allocator"]
 mt = ["allocator"]
+imgui = ["mhgu-forge-macros/imgui", "mhgu-forge-sys/imgui"]
 
 [dependencies]
 mhgu-forge-sys = { workspace = true }

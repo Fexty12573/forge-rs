@@ -1,4 +1,4 @@
-use alloc::ffi::CString;
+use alloc::{ffi::CString, vec::Vec};
 use sys::pattern::{Pattern as SysPattern, *};
 
 pub fn find(pattern: &str) -> Option<u32> {

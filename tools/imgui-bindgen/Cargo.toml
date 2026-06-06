@@ -1,0 +1,10 @@
+[package]
+name = "imgui-bindgen"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Dev-only tool: regenerates forge-sys/src/imgui_bindings.rs"
+
+[dependencies]
+bindgen = "0.72"
+regex = "1"

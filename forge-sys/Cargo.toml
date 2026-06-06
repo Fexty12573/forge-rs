@@ -7,7 +7,13 @@ license.workspace = true
 repository.workspace = true
 keywords = ["forge", "nro", "switch", "mhgu", "no-std"]
 categories = ["no-std", "game-engines", "embedded"]
+# The cimgui submodule + headers are only used to (re)generate the bindings
+exclude = ["imgui"]
 
 [lib]
 name = "forge_sys"
 path = "src/lib.rs"
+
+[features]
+default = []
+imgui = []
