@@ -11,11 +11,7 @@ use syn::{DeriveInput, FnArg, ItemFn, parse_macro_input, visit_mut::VisitMut};
 fn forge_crate() -> TokenStream2 {
     match crate_name("mhgu-forge") {
         Ok(FoundCrate::Itself) => quote! { crate },
-        Ok(FoundCrate::Name(name)) => {
-            let ident = syn::Ident::new(&name, proc_macro2::Span::call_site());
-            quote! { ::#ident }
-        }
-        Err(_) => quote! { ::forge },
+        Ok(FoundCrate::Name(_)) | Err(_) => quote! { ::forge },
     }
 }
 
