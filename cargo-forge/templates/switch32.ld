@@ -169,5 +169,15 @@ SECTIONS
     /DISCARD/ : {
         /* No need of the interpreter */
         *(.interp)
+
+        /* crti.o/.fini only has a prologue (no return) on bare-metal arm-none-eabi.
+           Discard these so the incomplete stubs are not called via the INIT/FINI entries. */
+        *(.init)
+        *(.fini)
     }
+
+    /* Redirect DT_INIT/DT_FINI to the forge-rt no-op stubs so the NRO loader does
+       not jump into the incomplete GCC stubs. */
+    _init = init;
+    _fini = fini;
 }
