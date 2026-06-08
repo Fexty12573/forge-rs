@@ -22,8 +22,8 @@ pub struct MtObject;
 
 impl MtObject {
     /// Returns the [`MtDti`] describing this object's concrete class.
-    pub fn dti(&self) -> &MtDti {
-        unsafe { &*(self.get_dti() as *const MtDti) }
+    pub fn dti(&self) -> &'static MtDti {
+        self.get_dti()
     }
 
     /// Collects this object's reflected properties into an [`MtPropertyList`].
@@ -32,7 +32,7 @@ impl MtObject {
     /// fresh list, which can then be iterated to inspect each property.
     pub fn get_properties(&self) -> MtPropertyList {
         let mut props = MtPropertyList::new();
-        self.create_property(&mut props as *mut MtPropertyList as *mut c_void);
+        self.create_property(&mut props);
         props
     }
 
@@ -61,46 +61,106 @@ impl MtObject {
 /// slot, so calling one runs the game's own implementation for that object.
 pub trait Object: HasVtable {
     /// Runs the destructor on `self`
+    ///
+    /// # Safety
+    /// `self` is in an undefined state after this function is called.
+    /// It is not safe to continue using the object.
     fn dtor(&mut self) {
         let func: unsafe extern "C" fn(&mut Self) = unsafe { transmute(self.get_virtual_function(0)) };
         unsafe { func(self) }
     }
 
     /// Runs the destructor on `self` and deallocates the object
+    ///
+    /// # Safety
+    /// `self` is in an undefined state after this function is called.
+    /// It is not safe to continue using the object.
     fn destroy(&mut self) {
         let func: unsafe extern "C" fn(&mut Self) = unsafe { transmute(self.get_virtual_function(1)) };
         unsafe { func(self) }
     }
 
-    /// Invokes the object's UI-creation virtual function (vtable slot 2).
+    /// Invokes the object's UI-creation virtual function.
+    ///
+    /// Note: Always unimplemented.
     fn create_ui(&self) {
         let func: unsafe extern "C" fn(&Self) = unsafe { transmute(self.get_virtual_function(2)) };
         unsafe { func(self) }
     }
 
-    /// Returns whether the object is currently an enabled instance (vtable slot
-    /// 3).
+    /// Returns whether the object is enabled
     fn is_enable_instance(&self) -> bool {
         let func: unsafe extern "C" fn(&Self) -> bool = unsafe { transmute(self.get_virtual_function(3)) };
         unsafe { func(self) }
     }
 
-    /// Populates `props` (an [`MtPropertyList`]) with the object's reflected
-    /// properties (vtable slot 4).
+    /// Populates `props` with the object's reflected properties.
     ///
     /// Prefer the safe [`MtObject::get_properties`] wrapper, which builds and
     /// returns the list for you.
-    fn create_property(&self, props: *mut c_void) {
-        let func: unsafe extern "C" fn(&Self, *mut c_void) = unsafe { transmute(self.get_virtual_function(4)) };
-        unsafe { func(self, props) }
+    fn create_property(&self, props: &mut MtPropertyList) {
+        let func: unsafe extern "C" fn(&Self, *mut MtPropertyList) = unsafe { transmute(self.get_virtual_function(4)) };
+        unsafe { func(self, props as *mut MtPropertyList) }
     }
 
-    /// Returns a raw pointer to the object's [`MtDti`] (vtable slot 5).
+    /// Returns a reference to the object's [`MtDti`].
     ///
-    /// Prefer the safe [`MtObject::dti`] wrapper, which returns a typed
-    /// reference.
-    fn get_dti(&self) -> *const c_void {
+    /// Equivalent to the [`MtObject::dti`] wrapper.
+    fn get_dti(&self) -> &'static MtDti {
         let func: unsafe extern "C" fn(&Self) -> *const c_void = unsafe { transmute(self.get_virtual_function(5)) };
-        unsafe { func(self) }
+        let dti = unsafe { func(self) };
+        unsafe { &*(dti as *const MtDti) }
+    }
+
+    /// Converts this object to a reference to an [`MtObject`].
+    fn to_mt_object(&self) -> &MtObject {
+        let ptr = self as *const Self as *const MtObject;
+        unsafe { &*ptr }
+    }
+
+    /// Converts this object to a mutable reference to an [`MtObject`].
+    fn to_mut_mt_object(&mut self) -> &mut MtObject {
+        let ptr = self as *mut Self as *mut MtObject;
+        unsafe { &mut *ptr }
+    }
+
+    /// Reads a value of type `T` from `self` at the given byte offset.
+    ///
+    /// # Safety
+    /// The caller must ensure that `self` is valid for reads of type `T` at the given offset.
+    /// `offset` must be a valid byte offset within `self`.
+    unsafe fn read<T>(&self, offset: usize) -> T {
+        let ptr = self as *const Self as *const u8;
+        unsafe { (ptr.add(offset) as *const T).read_unaligned() }
+    }
+
+    /// Writes a value of type `T` to `self` at the given byte offset.
+    ///
+    /// # Safety
+    /// The caller must ensure that `self` is valid for writes of type `T` at the given offset.
+    /// `offset` must be a valid byte offset within `self`.
+    unsafe fn write<T: Copy>(&mut self, offset: usize, value: &T) {
+        let ptr = self as *mut Self as *mut u8;
+        unsafe { *(ptr.add(offset) as *mut T) = *value };
+    }
+
+    /// Returns a reference to a value of type `T` within `self` at the given byte offset.
+    ///
+    /// # Safety
+    /// The caller must ensure that `self` is valid for reads of type `T` at the given offset.
+    /// `offset` must be a valid byte offset within `self`.
+    unsafe fn get_ref<T>(&self, offset: usize) -> &T {
+        let ptr = self as *const Self as *const u8;
+        unsafe { &*(ptr.add(offset) as *const T) }
+    }
+
+    /// Returns a mutable reference to a value of type `T` within `self` at the given byte offset.
+    ///
+    /// # Safety
+    /// The caller must ensure that `self` is valid for writes of type `T` at the given offset.
+    /// `offset` must be a valid byte offset within `self`.
+    unsafe fn get_mut_ref<T>(&mut self, offset: usize) -> &mut T {
+        let ptr = self as *mut Self as *mut u8;
+        unsafe { &mut *(ptr.add(offset) as *mut T) }
     }
 }
