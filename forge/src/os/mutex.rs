@@ -29,7 +29,7 @@ impl Mutex {
         unsafe { nnosUnlockMutex(self.ptr()) };
     }
 
-    fn ptr(&mut self) -> *mut MutexType {
+    pub(crate) fn ptr(&mut self) -> *mut MutexType {
         &mut self.inner as *mut MutexType
     }
 

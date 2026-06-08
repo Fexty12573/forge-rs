@@ -19,7 +19,7 @@ impl Barrier {
         unsafe { nnosAwaitBarrier(self.ptr()) };
     }
 
-    fn ptr(&mut self) -> *mut BarrierType {
+    pub(crate) fn ptr(&mut self) -> *mut BarrierType {
         &mut self.inner as *mut BarrierType
     }
 }

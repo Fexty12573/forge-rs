@@ -18,7 +18,7 @@ unsafe extern "C" {
     pub fn nnosFinalizeConditionVariable(var: *mut ConditionVariableType);
     pub fn nnosSignalConditionVariable(var: *mut ConditionVariableType);
     pub fn nnosBroadcastConditionVariable(var: *mut ConditionVariableType);
-    pub fn nnosWaitConditionVariable(var: *mut ConditionVariableType);
+    pub fn nnosWaitConditionVariable(var: *mut ConditionVariableType, mutex: *mut MutexType);
     pub fn nnosTimedWaitConditionVariable(
         var: *mut ConditionVariableType,
         mutex: *mut MutexType,

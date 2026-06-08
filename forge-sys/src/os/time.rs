@@ -1,3 +1,3 @@
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Default)]
-pub struct TimeSpanType(u64);
+pub struct TimeSpanType(pub u64);
