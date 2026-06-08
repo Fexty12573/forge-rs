@@ -6,7 +6,7 @@ pub struct EventType {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EventClearMode {
     Manual = 0,
     Auto = 1,

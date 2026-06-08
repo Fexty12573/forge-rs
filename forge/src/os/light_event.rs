@@ -7,10 +7,10 @@ pub struct LightEvent {
 }
 
 impl LightEvent {
-    pub fn new(signaled: bool, clear_mode: EventClearMode) -> Self {
-        let mut inner = LightEventType::default();
-        unsafe { forge_nnosInitializeLightEvent(&mut inner, signaled, clear_mode) };
-        Self { inner }
+    pub const fn new(signaled: bool, clear_mode: EventClearMode) -> Self {
+        Self {
+            inner: LightEventType::new(signaled, clear_mode),
+        }
     }
 
     pub fn finalize(&mut self) {
