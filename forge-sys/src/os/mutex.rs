@@ -1,4 +1,5 @@
 #[repr(C)]
+#[derive(Default)]
 pub struct MutexType {
     _reserved: [u8; 20],
 }

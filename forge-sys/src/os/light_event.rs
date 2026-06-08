@@ -1,6 +1,7 @@
 use crate::os::event::EventClearMode;
 
 #[repr(C)]
+#[derive(Default)]
 pub struct LightEventType {
     _reserved: [u8; 12],
 }

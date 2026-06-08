@@ -21,6 +21,7 @@ pub mod hook;
 pub mod input;
 pub mod log;
 pub mod mem;
+pub mod os;
 pub mod patch;
 pub mod socket;
 

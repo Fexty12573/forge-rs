@@ -21,3 +21,9 @@ unsafe extern "C" {
     pub fn nnosTimedWaitEvent(event: *mut EventType, timeout: TimeSpanType) -> bool;
     pub fn nnosClearEvent(event: *mut EventType);
 }
+
+impl Default for EventType {
+    fn default() -> Self {
+        Self { _reserved: [0u8; 36] }
+    }
+}

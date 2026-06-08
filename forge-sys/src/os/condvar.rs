@@ -1,6 +1,7 @@
 use crate::os::{mutex::MutexType, time::TimeSpanType};
 
 #[repr(C)]
+#[derive(Default)]
 pub struct ConditionVariableType {
     _reserved: [u8; 20], // TODO: Figure out actual size
 }
