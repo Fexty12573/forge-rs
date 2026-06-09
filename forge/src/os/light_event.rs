@@ -1,45 +1,45 @@
-use core::time::Duration;
+use core::{cell::UnsafeCell, time::Duration};
 
 use sys::os::{EventClearMode, TimeSpanType, light_event::*};
 
 pub struct LightEvent {
-    inner: LightEventType,
+    inner: UnsafeCell<LightEventType>,
 }
 
 impl LightEvent {
     pub const fn new(signaled: bool, clear_mode: EventClearMode) -> Self {
         Self {
-            inner: LightEventType::new(signaled, clear_mode),
+            inner: UnsafeCell::new(LightEventType::new(signaled, clear_mode)),
         }
     }
 
-    pub fn finalize(&mut self) {
+    pub fn finalize(&self) {
         unsafe { forge_nnosFinalizeLightEvent(self.ptr()) };
     }
 
-    pub fn signal(&mut self) {
+    pub fn signal(&self) {
         unsafe { forge_nnosSignalLightEvent(self.ptr()) };
     }
 
-    pub fn wait(&mut self) {
+    pub fn wait(&self) {
         unsafe { forge_nnosWaitLightEvent(self.ptr()) };
     }
 
-    pub fn try_wait(&mut self) -> bool {
+    pub fn try_wait(&self) -> bool {
         unsafe { forge_nnosTryWaitLightEvent(self.ptr()) }
     }
 
-    pub fn wait_timeout(&mut self, timeout: Duration) -> bool {
+    pub fn wait_timeout(&self, timeout: Duration) -> bool {
         let timeout = timeout.as_nanos() as u64;
         unsafe { forge_nnosTimedWaitLightEvent(self.ptr(), TimeSpanType(timeout)) }
     }
 
-    pub fn clear(&mut self) {
+    pub fn clear(&self) {
         unsafe { forge_nnosClearLightEvent(self.ptr()) };
     }
 
-    pub(crate) fn ptr(&mut self) -> *mut LightEventType {
-        &mut self.inner
+    pub(crate) fn ptr(&self) -> *mut LightEventType {
+        self.inner.get()
     }
 }
 

@@ -1,11 +1,11 @@
 use crate::os::mutex::Mutex;
 
 pub struct ScopedLock<'a> {
-    mtx: &'a mut Mutex,
+    mtx: &'a Mutex,
 }
 
 impl<'a> ScopedLock<'a> {
-    pub fn new(mtx: &'a mut Mutex) -> Self {
+    pub fn new(mtx: &'a Mutex) -> Self {
         mtx.lock();
         Self { mtx }
     }

@@ -1,45 +1,47 @@
-use core::time::Duration;
+use core::{cell::UnsafeCell, time::Duration};
 
 use sys::os::{TimeSpanType, event::*};
 
 pub struct Event {
-    inner: EventType,
+    inner: UnsafeCell<EventType>,
 }
 
 impl Event {
     pub fn new(signaled: bool, clear_mode: EventClearMode) -> Self {
         let mut inner = EventType::default();
         unsafe { nnosInitializeEvent(&mut inner, signaled, clear_mode) };
-        Self { inner }
+        Self {
+            inner: UnsafeCell::new(inner),
+        }
     }
 
-    pub fn finalize(&mut self) {
+    pub fn finalize(&self) {
         unsafe { nnosFinalizeEvent(self.ptr()) };
     }
 
-    pub fn signal(&mut self) {
+    pub fn signal(&self) {
         unsafe { nnosSignalEvent(self.ptr()) };
     }
 
-    pub fn wait(&mut self) {
+    pub fn wait(&self) {
         unsafe { nnosWaitEvent(self.ptr()) };
     }
 
-    pub fn try_wait(&mut self) -> bool {
+    pub fn try_wait(&self) -> bool {
         unsafe { nnosTryWaitEvent(self.ptr()) }
     }
 
-    pub fn wait_timeout(&mut self, timeout: Duration) -> bool {
+    pub fn wait_timeout(&self, timeout: Duration) -> bool {
         let timeout = timeout.as_nanos() as u64;
         unsafe { nnosTimedWaitEvent(self.ptr(), TimeSpanType(timeout)) }
     }
 
-    pub fn clear(&mut self) {
+    pub fn clear(&self) {
         unsafe { nnosClearEvent(self.ptr()) };
     }
 
-    pub(crate) fn ptr(&mut self) -> *mut EventType {
-        &mut self.inner
+    pub(crate) fn ptr(&self) -> *mut EventType {
+        self.inner.get()
     }
 }
 

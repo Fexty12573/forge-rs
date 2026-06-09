@@ -1,43 +1,45 @@
-use core::time::Duration;
+use core::{cell::UnsafeCell, time::Duration};
 
 use sys::os::{TimeSpanType, condvar::*};
 
 use crate::os::mutex::Mutex;
 
 pub struct ConditionVariable {
-    inner: ConditionVariableType,
+    inner: UnsafeCell<ConditionVariableType>,
 }
 
 impl ConditionVariable {
     pub fn new() -> Self {
         let mut inner = ConditionVariableType::default();
         unsafe { nnosInitializeConditionVariable(&mut inner as *mut ConditionVariableType) };
-        Self { inner }
+        Self {
+            inner: UnsafeCell::new(inner),
+        }
     }
 
-    pub fn finalize(&mut self) {
+    pub fn finalize(&self) {
         unsafe { nnosFinalizeConditionVariable(self.ptr()) };
     }
 
-    pub fn signal(&mut self) {
+    pub fn signal(&self) {
         unsafe { nnosSignalConditionVariable(self.ptr()) };
     }
 
-    pub fn broadcast(&mut self) {
+    pub fn broadcast(&self) {
         unsafe { nnosBroadcastConditionVariable(self.ptr()) };
     }
 
-    pub fn wait(&mut self, mutex: &mut Mutex) {
+    pub fn wait(&self, mutex: &Mutex) {
         unsafe { nnosWaitConditionVariable(self.ptr(), mutex.ptr()) };
     }
 
-    pub fn wait_timeout(&mut self, mutex: &mut Mutex, timeout: Duration) -> ConditionVariableStatus {
+    pub fn wait_timeout(&self, mutex: &Mutex, timeout: Duration) -> ConditionVariableStatus {
         let timeout = timeout.as_nanos() as u64;
         unsafe { nnosTimedWaitConditionVariable(self.ptr(), mutex.ptr(), TimeSpanType(timeout)) }
     }
 
-    pub(crate) fn ptr(&mut self) -> *mut ConditionVariableType {
-        &mut self.inner as *mut ConditionVariableType
+    pub(crate) fn ptr(&self) -> *mut ConditionVariableType {
+        self.inner.get()
     }
 }
 

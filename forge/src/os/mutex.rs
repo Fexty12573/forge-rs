@@ -1,7 +1,9 @@
+use core::cell::UnsafeCell;
+
 use sys::os::mutex::*;
 
 pub struct Mutex {
-    inner: MutexType,
+    inner: UnsafeCell<MutexType>,
 }
 
 impl Mutex {
@@ -13,30 +15,32 @@ impl Mutex {
         Self::new_internal(true)
     }
 
-    pub fn finalize(&mut self) {
+    pub fn finalize(&self) {
         unsafe { nnosFinalizeMutex(self.ptr()) };
     }
 
-    pub fn lock(&mut self) {
+    pub fn lock(&self) {
         unsafe { nnosLockMutex(self.ptr()) };
     }
 
-    pub fn try_lock(&mut self) -> bool {
+    pub fn try_lock(&self) -> bool {
         unsafe { nnosTryLockMutex(self.ptr()) }
     }
 
-    pub fn unlock(&mut self) {
+    pub fn unlock(&self) {
         unsafe { nnosUnlockMutex(self.ptr()) };
     }
 
-    pub(crate) fn ptr(&mut self) -> *mut MutexType {
-        &mut self.inner as *mut MutexType
+    pub(crate) fn ptr(&self) -> *mut MutexType {
+        self.inner.get()
     }
 
     fn new_internal(recursive: bool) -> Self {
         let mut inner = MutexType::default();
         unsafe { nnosInitializeMutex(&mut inner as *mut MutexType, recursive, 0) };
-        Self { inner }
+        Self {
+            inner: UnsafeCell::new(inner),
+        }
     }
 }
 

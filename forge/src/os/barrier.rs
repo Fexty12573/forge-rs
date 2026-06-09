@@ -1,26 +1,30 @@
+use core::cell::UnsafeCell;
+
 use sys::os::barrier::*;
 
 pub struct Barrier {
-    inner: BarrierType,
+    inner: UnsafeCell<BarrierType>,
 }
 
 impl Barrier {
     pub fn new(threads: u32) -> Self {
         let mut inner = BarrierType::default();
         unsafe { nnosInitializeBarrier(&mut inner as *mut BarrierType, threads as i32) };
-        Self { inner }
+        Self {
+            inner: UnsafeCell::new(inner),
+        }
     }
 
-    pub fn finalize(&mut self) {
+    pub fn finalize(&self) {
         unsafe { nnosFinalizeBarrier(self.ptr()) };
     }
 
-    pub fn wait(&mut self) {
+    pub fn wait(&self) {
         unsafe { nnosAwaitBarrier(self.ptr()) };
     }
 
-    pub(crate) fn ptr(&mut self) -> *mut BarrierType {
-        &mut self.inner as *mut BarrierType
+    pub(crate) fn ptr(&self) -> *mut BarrierType {
+        self.inner.get()
     }
 }
 

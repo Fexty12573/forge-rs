@@ -14,7 +14,7 @@ const INIT: u8 = 2;
 
 pub struct OnceLock<T> {
     state: AtomicU8,
-    ready: UnsafeCell<LightEvent>,
+    ready: LightEvent,
     value: UnsafeCell<MaybeUninit<T>>,
 }
 
@@ -25,7 +25,7 @@ impl<T> OnceLock<T> {
     pub const fn new() -> Self {
         Self {
             state: AtomicU8::new(UNINIT),
-            ready: UnsafeCell::new(LightEvent::new(false, EventClearMode::Manual)),
+            ready: LightEvent::new(false, EventClearMode::Manual),
             value: UnsafeCell::new(MaybeUninit::uninit()),
         }
     }
@@ -50,10 +50,10 @@ impl<T> OnceLock<T> {
             Ok(_) => {
                 unsafe { (*self.value.get()).write(f()) };
                 self.state.store(INIT, Ordering::Release);
-                unsafe { (*self.ready.get()).signal() };
+                self.ready.signal();
             }
             Err(_) => {
-                unsafe { (*self.ready.get()).wait() };
+                self.ready.wait();
             }
         }
 
