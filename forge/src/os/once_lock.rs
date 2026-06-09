@@ -38,6 +38,14 @@ impl<T> OnceLock<T> {
         }
     }
 
+    pub fn get_mut(&mut self) -> Option<&mut T> {
+        if self.state.load(Ordering::Acquire) == INIT {
+            Some(unsafe { (*self.value.get_mut()).assume_init_mut() })
+        } else {
+            None
+        }
+    }
+
     pub fn get_or_init(&self, f: impl FnOnce() -> T) -> &T {
         if self.state.load(Ordering::Acquire) == INIT {
             return unsafe { (*self.value.get()).assume_init_ref() };
