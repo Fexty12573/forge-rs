@@ -13,3 +13,7 @@ pub fn core() -> i32 {
 pub fn sleep_for(duration: Duration) {
     unsafe { nnosSleepThread(TimeSpanType(duration.as_nanos() as u64)) };
 }
+
+pub fn yield_now() {
+    unsafe { nnosYieldThread() };
+}
