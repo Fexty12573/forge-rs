@@ -7,6 +7,9 @@ pub mod lock;
 pub mod mutex;
 pub mod once_lock;
 
+#[cfg(feature = "allocator")]
+pub mod tls;
+
 pub mod sync {
     pub use super::barrier::*;
     pub use super::condvar::*;
