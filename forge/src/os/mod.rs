@@ -1,3 +1,7 @@
+/// OS synchronization primitives and threading utilities.
+///
+/// Thread-management types ([`thread`] and [`tls`]) require the `allocator` feature.
+/// All synchronization types are also re-exported flat from the [`sync`] submodule.
 pub mod barrier;
 pub mod condvar;
 pub mod event;

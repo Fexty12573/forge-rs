@@ -4,6 +4,10 @@ use sys::os::tls::*;
 
 use alloc::boxed::Box;
 
+/// A thread-local storage slot holding an independent value of type `T` per thread.
+///
+/// The value for each thread is constructed lazily on first access using the `init`
+/// function supplied at creation time, and dropped when the thread exits.
 pub struct ThreadLocal<T> {
     slot: TlsSlot,
     init: fn() -> T,
@@ -14,6 +18,7 @@ unsafe impl<T: Send> Send for ThreadLocal<T> {}
 unsafe impl<T: Send> Sync for ThreadLocal<T> {}
 
 impl<T> ThreadLocal<T> {
+    /// Allocates a TLS slot. `init` is called once per thread to construct its value.
     pub fn new(init: fn() -> T) -> Self {
         let mut slot = TlsSlot::new();
         let result = unsafe { nnosAllocateTlsSlot(&mut slot, Self::destructor) };
@@ -29,10 +34,12 @@ impl<T> ThreadLocal<T> {
         }
     }
 
+    /// Calls `f` with a shared reference to this thread's value, initializing it on first access.
     pub fn with<R>(&self, f: impl FnOnce(&T) -> R) -> R {
         f(self.get_or_init())
     }
 
+    /// Calls `f` with a mutable reference to this thread's value, initializing it on first access.
     pub fn with_mut<R>(&self, f: impl FnOnce(&mut T) -> R) -> R {
         f(self.get_or_init())
     }
