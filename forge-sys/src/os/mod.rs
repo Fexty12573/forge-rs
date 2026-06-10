@@ -3,6 +3,7 @@ pub mod condvar;
 pub mod event;
 pub mod light_event;
 pub mod mutex;
+pub mod thread;
 pub mod time;
 pub mod tls;
 

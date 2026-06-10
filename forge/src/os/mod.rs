@@ -6,6 +6,10 @@ pub mod light_event;
 pub mod lock;
 pub mod mutex;
 pub mod once_lock;
+pub mod this_thread;
+
+#[cfg(feature = "allocator")]
+pub mod thread;
 
 #[cfg(feature = "allocator")]
 pub mod tls;
