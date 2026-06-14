@@ -18,9 +18,11 @@ allocator = []
 patterns = ["allocator"]
 mt = ["allocator"]
 imgui = ["mhgu-forge-macros/imgui", "mhgu-forge-sys/imgui"]
+config = ["allocator", "dep:ini_core", "mhgu-forge-macros/config"]
 
 [dependencies]
 mhgu-forge-sys = { workspace = true }
 mhgu-forge-rt = { workspace = true, features = ["logging"] }
 mhgu-forge-macros = { workspace = true }
 log = { version = "0.4", default-features = false }
+ini_core = { version = "0.2.0", optional = true }

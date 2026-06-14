@@ -16,6 +16,8 @@ fn forge_crate() -> TokenStream2 {
 }
 
 mod hook;
+#[cfg(feature = "config")]
+mod ini;
 mod pure_virtual;
 
 /// Marks a function as the plugins entry point.
@@ -388,4 +390,62 @@ pub fn cache_dti_derive(input: TokenStream) -> TokenStream {
     };
 
     expanded.into()
+}
+
+/// Derives `IniDeserialize` for a struct, reading each field from an `Ini`.
+///
+/// Field attributes:
+/// - `#[section("Name")]` sets the section for this field and all following
+///   fields until another `#[section]` is seen. Scalar fields are read from this
+///   section; nested struct fields create a sub-section under it.
+/// - `#[alias("name")]` overrides the property key (scalar) or sub-section name
+///   (nested struct); the field name is used otherwise.
+///
+/// Scalar field types must implement `FromStr + Default`. Struct field types must
+/// themselves implement `IniDeserialize` and are deserialized into the
+/// sub-section `<section>.<field>`. Enums are not supported.
+///
+/// ### Example
+/// ```ignore
+/// #[derive(forge::IniDeserialize)]
+/// struct Config {
+///     #[section("Timing")]
+///     delay: i32,
+///     speed: f32,
+///
+///     #[section("General")]
+///     #[alias("MyStruct")]
+///     mystruct: MyStruct, // -> [General.MyStruct]
+/// }
+/// ```
+#[cfg(feature = "config")]
+#[proc_macro_derive(IniDeserialize, attributes(section, alias))]
+pub fn ini_deserialize_derive(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    ini::ini_deserialize_derive(input).into()
+}
+
+/// Derives `IniSerialize` for a struct, writing each field into an `Ini`.
+///
+/// This is the inverse of [`macro@IniDeserialize`] and uses the same `#[section]`
+/// and `#[alias]` field attributes with identical section/sub-section semantics.
+///
+/// Scalar field types must implement `ToString`. Struct field types must
+/// themselves implement `IniSerialize` and are written into the sub-section
+/// `<section>.<field>`. Enums are not supported.
+///
+/// ### Example
+/// ```ignore
+/// #[derive(forge::IniSerialize)]
+/// struct Config {
+///     #[section("Timing")]
+///     delay: i32,
+///     speed: f32,
+/// }
+/// ```
+#[cfg(feature = "config")]
+#[proc_macro_derive(IniSerialize, attributes(section, alias))]
+pub fn ini_serialize_derive(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    ini::ini_serialize_derive(input).into()
 }

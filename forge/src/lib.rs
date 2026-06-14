@@ -17,6 +17,9 @@ include!(concat!(env!("OUT_DIR"), "/version.rs"));
 #[cfg(feature = "allocator")]
 mod allocator;
 
+#[cfg(feature = "config")]
+pub mod config;
+pub mod fs;
 pub mod hook;
 pub mod input;
 pub mod log;

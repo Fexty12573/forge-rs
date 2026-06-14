@@ -1,6 +1,7 @@
 #![no_std]
 
 pub mod cpp;
+pub mod fs;
 pub mod graphics;
 pub mod hook;
 pub mod init;
