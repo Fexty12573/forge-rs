@@ -1,5 +1,14 @@
-use core::ffi::CStr;
+use alloc::ffi::CString;
+use core::{ffi::CStr, str::FromStr};
 use sys::fs::*;
+
+pub fn file_exists(path: &str) -> bool {
+    let path = CString::from_str(path);
+    match path {
+        Ok(p) => unsafe { forge_fs_fileExists(p.as_ptr()) },
+        Err(_) => false,
+    }
+}
 
 pub mod romfs {
     use super::*;
@@ -41,5 +50,23 @@ pub mod savedata {
     /// - You have not called `mount()` at least once before calling this function.
     pub fn unmount() {
         unsafe { forge_fs_unmountSaveData() }
+    }
+
+    pub struct ScopedMount;
+
+    impl ScopedMount {
+        pub fn new() -> Self {
+            if !savedata::mount() {
+                panic!("Failed to mount savedata");
+            }
+
+            Self
+        }
+    }
+
+    impl Drop for ScopedMount {
+        fn drop(&mut self) {
+            savedata::unmount();
+        }
     }
 }

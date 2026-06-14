@@ -93,7 +93,7 @@ pub fn ini_deserialize_derive(input: DeriveInput) -> TokenStream2 {
                 #[allow(unused_imports)]
                 use #forge::config::__private::{IniNestedField as _, IniScalarField as _};
                 (&#forge::config::__private::Probe::<#ty>(::core::marker::PhantomData))
-                    .__ini_read(__ini, &__section, #key)
+                    .__ini_read(__ini, __section.as_str(), #key)
             },
         }
     });
@@ -128,7 +128,7 @@ pub fn ini_serialize_derive(input: DeriveInput) -> TokenStream2 {
                 #[allow(unused_imports)]
                 use #forge::config::__private::{IniNestedWrite as _, IniScalarWrite as _};
                 (&#forge::config::__private::Probe::<#ty>(::core::marker::PhantomData))
-                    .__ini_write(&self.#ident, __ini, &__section, #key);
+                    .__ini_write(&self.#ident, __ini, __section.as_str(), #key);
             }
         }
     });

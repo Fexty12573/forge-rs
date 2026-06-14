@@ -19,6 +19,7 @@ mod allocator;
 
 #[cfg(feature = "config")]
 pub mod config;
+#[cfg(feature = "allocator")]
 pub mod fs;
 pub mod hook;
 pub mod input;

@@ -5,4 +5,5 @@ unsafe extern "C" {
     pub fn forge_fs_unmountSaveData();
     pub fn forge_fs_getSaveDataMountPoint() -> *const c_char;
     pub fn forge_fs_getRomFsMountPoint() -> *const c_char;
+    pub fn forge_fs_fileExists(path: *const c_char) -> bool;
 }

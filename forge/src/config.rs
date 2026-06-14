@@ -1,4 +1,7 @@
+use alloc::{format, string::String};
 use ini::Ini;
+
+use crate::fs::*;
 
 pub mod ini;
 
@@ -19,6 +22,35 @@ pub trait IniSerialize {
         let mut ini = Ini::default();
         self.to_ini_section(&mut ini, "");
         ini
+    }
+}
+
+/// Loads the given config file if it exists, and creates it if not.
+///
+/// # Notes
+/// This function stores and loads the config from the savedata directory as
+/// that is unfortunately the only way the application can write anything to disk.
+///
+/// # Example
+/// ```ignore
+/// #[derive(Default, IniDeserialize, IniSerialize)]
+/// struct MyConfig {
+///     pub value: i32,
+/// }
+///
+/// let config: MyConfig = forge::config::load("my_config.ini");
+/// ```
+pub fn load<T: IniDeserialize + IniSerialize + Default>(filename: &str) -> Result<T, String> {
+    let _mount = savedata::ScopedMount::new();
+
+    let path = format!("{}:/{}\0", savedata::mount_point(), filename);
+    if file_exists(&path) {
+        let ini = ini::Reader::read(&path)?;
+        Ok(T::from_ini(&ini))
+    } else {
+        let config = T::default();
+        ini::Writer::write(&path, &config.to_ini())?;
+        Ok(config)
     }
 }
 
