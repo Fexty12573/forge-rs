@@ -1,12 +1,15 @@
 use alloc::ffi::CString;
-use core::{ffi::CStr, str::FromStr};
+use core::ffi::CStr;
+use log::error;
 use sys::fs::*;
 
 pub fn file_exists(path: &str) -> bool {
-    let path = CString::from_str(path);
-    match path {
-        Ok(p) => unsafe { forge_fs_fileExists(p.as_ptr()) },
-        Err(_) => false,
+    match CString::new(path) {
+        Ok(path) => unsafe { forge_fs_fileExists(path.as_ptr()) },
+        Err(err) => {
+            error!("{err}");
+            false
+        }
     }
 }
 
