@@ -43,7 +43,7 @@ pub trait IniSerialize {
 pub fn load<T: IniDeserialize + IniSerialize + Default>(filename: &str) -> Result<T, String> {
     let _mount = savedata::ScopedMount::new();
 
-    let path = format!("{}:/{}\0", savedata::mount_point(), filename);
+    let path = format!("{}:/{}", savedata::mount_point(), filename);
     if file_exists(&path) {
         let ini = ini::Reader::read(&path)?;
         Ok(T::from_ini(&ini))
