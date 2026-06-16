@@ -1,3 +1,4 @@
+use core::ffi::CStr;
 use core::fmt::Write;
 
 use macros::{CacheDti, Object, pure_virtual};
@@ -67,11 +68,11 @@ impl MtFile {
     /// Returns [`MtError::DtiNotFound`] if the `MtFile` class is missing,
     /// [`MtError::FailedToCreateInstance`] if construction fails, or
     /// [`MtError::FailedToOpenFile`] if the open itself fails.
-    pub fn open(path: &str, mode: OpenMode) -> MtResult<&mut Self> {
+    pub fn open(path: &CStr, mode: OpenMode) -> MtResult<&mut Self> {
         let dti = Self::dti().ok_or(MtError::DtiNotFound("MtFile"))?;
         let file: &mut MtFile = dti.new().ok_or(MtError::FailedToCreateInstance("MtFile"))?;
 
-        let success = file.open_impl(path.as_ptr(), mode as i32, false);
+        let success = file.open_impl(path.as_ptr().cast(), mode as i32, false);
         if success { Ok(file) } else { Err(MtError::FailedToOpenFile) }
     }
 

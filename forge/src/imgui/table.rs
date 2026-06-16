@@ -2,7 +2,7 @@ use core::ffi::CStr;
 
 use sys::imgui::*;
 
-pub fn begin_table(str_id: &str, columns: i32, flags: ImGuiTableFlags, outer_size: ImVec2, inner_width: f32) -> bool {
+pub fn begin_table(str_id: &CStr, columns: i32, flags: ImGuiTableFlags, outer_size: ImVec2, inner_width: f32) -> bool {
     unsafe { igBeginTable(str_id.as_ptr(), columns, flags, outer_size, inner_width) }
 }
 
@@ -22,7 +22,7 @@ pub fn table_set_column_index(column: i32) -> bool {
     unsafe { igTableSetColumnIndex(column) }
 }
 
-pub fn table_setup_column(label: &str, flags: ImGuiTableColumnFlags, init_width_or_weight: f32, user_id: ImGuiID) {
+pub fn table_setup_column(label: &CStr, flags: ImGuiTableColumnFlags, init_width_or_weight: f32, user_id: ImGuiID) {
     unsafe { igTableSetupColumn(label.as_ptr(), flags, init_width_or_weight, user_id) }
 }
 
@@ -38,7 +38,7 @@ pub fn table_angled_headers_row() {
     unsafe { igTableAngledHeadersRow() }
 }
 
-pub fn table_header(label: &str) {
+pub fn table_header(label: &CStr) {
     unsafe { igTableHeader(label.as_ptr()) }
 }
 

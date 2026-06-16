@@ -38,5 +38,5 @@ pub use window::*;
 
 pub enum Id {
     Int(u32),
-    Str(&'static str),
+    Str(&'static core::ffi::CStr),
 }

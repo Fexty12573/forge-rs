@@ -1,7 +1,9 @@
+use core::ffi::CStr;
+
 use super::Id;
 use sys::imgui::*;
 
-pub fn begin(name: &str, open: Option<&mut bool>, flags: ImGuiWindowFlags) -> bool {
+pub fn begin(name: &CStr, open: Option<&mut bool>, flags: ImGuiWindowFlags) -> bool {
     unsafe { igBegin(name.as_ptr(), open.map_or(core::ptr::null_mut(), |p| p as *mut bool), flags) }
 }
 

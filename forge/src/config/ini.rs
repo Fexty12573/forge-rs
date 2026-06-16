@@ -1,6 +1,6 @@
 use core::{fmt::Write, str::FromStr};
 
-use alloc::{borrow::ToOwned, boxed::Box, collections::BTreeMap, format, string::String};
+use alloc::{borrow::ToOwned, boxed::Box, collections::BTreeMap, ffi::CString, format, string::String};
 use ini_core as ini;
 
 use crate::mt::{
@@ -17,7 +17,8 @@ pub struct Ini {
 
 impl Reader {
     pub fn read(path: &str) -> Result<Ini, String> {
-        let file = MtFile::open(path, OpenMode::Read).map_err(|err| format!("{err}"))?;
+        let path = CString::new(path).map_err(|err| format!("{err}"))?;
+        let file = MtFile::open(&path, OpenMode::Read).map_err(|err| format!("{err}"))?;
 
         let mut buf = unsafe { Box::<[u8]>::new_zeroed_slice(file.size()).assume_init() };
         assert_eq!(file.read(&mut buf), buf.len());
@@ -51,7 +52,8 @@ impl Reader {
 
 impl Writer {
     pub fn write(path: &str, ini: &Ini) -> Result<(), String> {
-        let file = MtFile::open(path, OpenMode::Write).map_err(|err| format!("{err}"))?;
+        let path = CString::new(path).map_err(|err| format!("{err}"))?;
+        let file = MtFile::open(&path, OpenMode::Write).map_err(|err| format!("{err}"))?;
 
         for (section, properties) in &ini.map {
             writeln!(file, "[{}]", section).map_err(|err| format!("{err}"))?;

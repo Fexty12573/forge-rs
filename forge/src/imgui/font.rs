@@ -1,3 +1,5 @@
+use core::ffi::CStr;
+
 use sys::imgui::*;
 
 use crate::imgui::get_io;
@@ -14,13 +16,13 @@ pub fn pop_font() {
 pub struct ImFont(*mut sys::imgui::ImFont);
 
 impl ImFont {
-    pub fn load(path: &str) -> Option<Self> {
+    pub fn load(path: &CStr) -> Option<Self> {
         let io = get_io();
         let font = unsafe { ImFontAtlas_AddFontFromFileTTF(io.Fonts, path.as_ptr(), 0.0, core::ptr::null(), core::ptr::null()) };
         if font.is_null() { None } else { Some(Self(font)) }
     }
 
-    pub fn load_with(path: &str, size: f32, cfg: &ImFontConfig, glyph_ranges: Option<&[ImWchar]>) -> Option<Self> {
+    pub fn load_with(path: &CStr, size: f32, cfg: &ImFontConfig, glyph_ranges: Option<&[ImWchar]>) -> Option<Self> {
         let io = get_io();
         let font = unsafe {
             ImFontAtlas_AddFontFromFileTTF(

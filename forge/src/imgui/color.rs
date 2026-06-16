@@ -1,3 +1,5 @@
+use core::ffi::CStr;
+
 use sys::imgui::*;
 
 /// Packs RGBA bytes (0-255 each) into a Dear ImGui `ImU32` color.
@@ -21,19 +23,19 @@ pub fn get_color_u32_u32(col: ImU32, alpha_mul: f32) -> ImU32 {
     unsafe { igGetColorU32_U32(col, alpha_mul) }
 }
 
-pub fn color_edit3(label: &str, col: &mut [f32; 3], flags: ImGuiColorEditFlags) -> bool {
+pub fn color_edit3(label: &CStr, col: &mut [f32; 3], flags: ImGuiColorEditFlags) -> bool {
     unsafe { igColorEdit3(label.as_ptr(), col.as_mut_ptr(), flags) }
 }
 
-pub fn color_edit4(label: &str, col: &mut [f32; 4], flags: ImGuiColorEditFlags) -> bool {
+pub fn color_edit4(label: &CStr, col: &mut [f32; 4], flags: ImGuiColorEditFlags) -> bool {
     unsafe { igColorEdit4(label.as_ptr(), col.as_mut_ptr(), flags) }
 }
 
-pub fn color_picker3(label: &str, col: &mut [f32; 3], flags: ImGuiColorEditFlags) -> bool {
+pub fn color_picker3(label: &CStr, col: &mut [f32; 3], flags: ImGuiColorEditFlags) -> bool {
     unsafe { igColorPicker3(label.as_ptr(), col.as_mut_ptr(), flags) }
 }
 
-pub fn color_picker4(label: &str, col: &mut [f32; 4], flags: ImGuiColorEditFlags) -> bool {
+pub fn color_picker4(label: &CStr, col: &mut [f32; 4], flags: ImGuiColorEditFlags) -> bool {
     unsafe { igColorPicker4(label.as_ptr(), col.as_mut_ptr(), flags, core::ptr::null()) }
 }
 

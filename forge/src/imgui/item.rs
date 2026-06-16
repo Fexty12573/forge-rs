@@ -189,7 +189,7 @@ pub fn get_clipboard_text() -> &'static str {
     }
 }
 
-pub fn set_clipboard_text(text: &str) {
+pub fn set_clipboard_text(text: &CStr) {
     unsafe { igSetClipboardText(text.as_ptr()) }
 }
 

@@ -1,10 +1,12 @@
+use core::ffi::CStr;
+
 use sys::imgui::*;
 
 pub fn plot_lines(
-    label: &str,
+    label: &CStr,
     values: &[f32],
     values_offset: i32,
-    overlay: Option<&str>,
+    overlay: Option<&CStr>,
     scale_min: f32,
     scale_max: f32,
     graph_size: ImVec2,
@@ -26,10 +28,10 @@ pub fn plot_lines(
 }
 
 pub fn plot_histogram(
-    label: &str,
+    label: &CStr,
     values: &[f32],
     values_offset: i32,
-    overlay: Option<&str>,
+    overlay: Option<&CStr>,
     scale_min: f32,
     scale_max: f32,
     graph_size: ImVec2,

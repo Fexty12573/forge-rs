@@ -1,3 +1,5 @@
+use core::ffi::CStr;
+
 use sys::imgui::*;
 
 pub fn begin_tooltip() -> bool {
@@ -21,6 +23,6 @@ pub fn begin_item_tooltip() -> bool {
     unsafe { igBeginItemTooltip() }
 }
 
-pub fn set_item_tooltip(s: &str) {
+pub fn set_item_tooltip(s: &CStr) {
     unsafe { igSetItemTooltip(b"%s\0".as_ptr(), s.as_ptr()) }
 }
