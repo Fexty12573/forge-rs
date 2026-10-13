@@ -6,8 +6,8 @@ pub struct Hook {
     pub target: *const c_void,
     pub detour: *const c_void,
     pub original: *const c_void,
-    jit1: [u8; 24], // Opaque data for libnx JIT structure
-    jit2: [u8; 24], // Opaque data for libnx JIT structure
+    pub context: *const c_void,
+    pub ctx_cell: *const c_void,
     has_ctx: bool,
 }
 
