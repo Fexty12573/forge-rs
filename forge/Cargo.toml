@@ -19,6 +19,7 @@ patterns = ["allocator"]
 mt = ["allocator"]
 imgui = ["mhgu-forge-macros/imgui", "mhgu-forge-sys/imgui"]
 config = ["allocator", "dep:ini_core", "mhgu-forge-macros/config"]
+nvn = ["mhgu-forge-sys/nvn"]
 
 [dependencies]
 mhgu-forge-sys = { workspace = true }
