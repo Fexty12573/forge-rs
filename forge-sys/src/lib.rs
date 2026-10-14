@@ -16,3 +16,6 @@ pub mod socket;
 
 #[cfg(feature = "imgui")]
 pub mod imgui;
+
+#[cfg(feature = "nvn")]
+pub mod nvn;
