@@ -6,6 +6,7 @@ mod aliases;
 pub mod device;
 mod funcs;
 pub mod queue;
+pub mod sync;
 pub mod texture;
 
 pub use aliases::*;

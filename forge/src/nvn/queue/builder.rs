@@ -20,9 +20,9 @@ impl QueueBuilder {
         b
     }
 
-    pub fn set_device(&mut self, device: &mut Device) -> &mut Self {
+    pub fn set_device(&mut self, device: &Device) -> &mut Self {
         unsafe {
-            ffi::queue_builder_set_device(&mut self.0, device.0);
+            ffi::queue_builder_set_device(&mut self.0, device.as_ptr());
         }
         self
     }
