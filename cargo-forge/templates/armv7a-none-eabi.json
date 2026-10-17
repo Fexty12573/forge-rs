@@ -15,6 +15,12 @@
     "max-atomic-width": 64,
     "panic-strategy": "abort",
     "relocation-model": "pic",
+    "pre-link-args": {
+        "gcc": [
+            "-nostartfiles",
+            "-Wl,-z,text"
+        ]
+    },
     "dynamic-linking": true,
     "executables": true,
     "relro-level": "off",
