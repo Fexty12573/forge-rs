@@ -2,8 +2,14 @@ use sys::nvn::fptr::{FnDeviceGetProcAddress, NVNprocs};
 
 use crate::os::sync::OnceLock;
 
+mod aliases;
+pub mod device;
 mod funcs;
-pub use funcs::*;
+pub mod queue;
+pub mod texture;
+
+pub use aliases::*;
+pub use texture::{ImageHandle, TextureHandle};
 
 #[unsafe(no_mangle)]
 extern "C" fn forge_onNvnInit(get_proc_addr: Option<FnDeviceGetProcAddress>) {

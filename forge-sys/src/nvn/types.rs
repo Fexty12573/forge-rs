@@ -1,10 +1,19 @@
 use core::ffi::c_void;
+use core::mem::MaybeUninit;
 
 macro_rules! opaque_struct {
     ($name:ident, $size:expr) => {
         #[repr(C)]
         pub struct $name {
-            _reserved: [u8; $size],
+            _reserved: MaybeUninit<[u8; $size]>,
+        }
+
+        impl Default for $name {
+            fn default() -> Self {
+                Self {
+                    _reserved: MaybeUninit::uninit(),
+                }
+            }
         }
     };
 }
@@ -437,11 +446,13 @@ pub enum NVNqueueGetErrorResult {
     Timeout,
 }
 
-#[repr(i32)]
-pub enum NVNqueueBuilderFlags {
-    None = 0,
-    NoFragmentInterlock,
-    NoZCull,
+pub type NVNqueueBuilderFlags_ = i32;
+
+pub struct NVNqueueBuilderFlags;
+impl NVNqueueBuilderFlags {
+    pub const NONE: i32 = 0 << 0;
+    pub const NO_FRAGMENT_INTERLOCK: i32 = 1 << 0;
+    pub const NO_Z_CULL: i32 = 1 << 2;
 }
 
 #[repr(i32)]

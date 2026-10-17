@@ -58,7 +58,7 @@ nvn_fns! {
     queue_reset_memory_usage_counts(queue: *mut NVNqueue);
     queue_builder_set_device(builder: *mut NVNqueueBuilder, device: *mut NVNdevice);
     queue_builder_set_defaults(builder: *mut NVNqueueBuilder);
-    queue_builder_set_flags(builder: *mut NVNqueueBuilder, flags: NVNqueueBuilderFlags);
+    queue_builder_set_flags(builder: *mut NVNqueueBuilder, flags: NVNqueueBuilderFlags_);
     queue_builder_set_command_memory_size(builder: *mut NVNqueueBuilder, size: usize);
     queue_builder_set_control_memory_size(builder: *mut NVNqueueBuilder, size: usize);
     queue_builder_set_compute_memory_size(builder: *mut NVNqueueBuilder, size: usize);
@@ -66,7 +66,7 @@ nvn_fns! {
     queue_builder_set_queue_memory(builder: *mut NVNqueueBuilder, memory: *mut c_void, size: usize);
     queue_builder_set_command_flush_threshold(builder: *mut NVNqueueBuilder, size: usize);
     queue_builder_get_device(builder: *const NVNqueueBuilder) -> *const NVNdevice;
-    queue_builder_get_flags(builder: *const NVNqueueBuilder) -> NVNqueueBuilderFlags;
+    queue_builder_get_flags(builder: *const NVNqueueBuilder) -> NVNqueueBuilderFlags_;
     queue_builder_get_command_memory_size(builder: *const NVNqueueBuilder) -> usize;
     queue_initialize(queue: *mut NVNqueue, builder: *const NVNqueueBuilder) -> bool;
     queue_finalize(queue: *mut NVNqueue);
