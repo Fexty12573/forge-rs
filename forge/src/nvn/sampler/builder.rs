@@ -1,7 +1,8 @@
 use core::mem::MaybeUninit;
 
-use sys::nvn::types::{NVNsampler, NVNsamplerBuilder};
+use sys::nvn::types::NVNsamplerBuilder;
 
+use crate::nvn::owned::Owned;
 use crate::nvn::{
     CompareFunc, CompareMode, MagFilter, MinFilter, SamplerReduction, WrapMode, device::Device, funcs as ffi, sampler::Sampler,
 };
@@ -179,12 +180,7 @@ impl SamplerBuilder {
         unsafe { ffi::sampler_builder_get_lod_snap(&self.0) }
     }
 
-    pub fn build(&self) -> Sampler {
-        let mut sampler = NVNsampler::default();
-        unsafe {
-            ffi::sampler_initialize(&mut sampler, &self.0);
-        }
-
-        Sampler(sampler)
+    pub fn build(&self) -> Option<Owned<Sampler>> {
+        Owned::<Sampler>::try_new(|sampler| unsafe { ffi::sampler_initialize(sampler.as_ptr(), &self.0) })
     }
 }

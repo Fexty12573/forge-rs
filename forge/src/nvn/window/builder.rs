@@ -1,5 +1,6 @@
+use crate::nvn::owned::Owned;
 use crate::nvn::{NativeWindow, device::Device, funcs as ffi, texture::Texture, window::Window};
-use sys::nvn::types::{NVNtexture, NVNwindow, NVNwindowBuilder};
+use sys::nvn::types::{NVNtexture, NVNwindowBuilder};
 
 #[repr(transparent)]
 pub struct WindowBuilder(pub NVNwindowBuilder);
@@ -59,12 +60,7 @@ impl WindowBuilder {
         unsafe { ffi::window_builder_get_present_interval(&self.0) }
     }
 
-    pub fn build(&self) -> Window {
-        let mut window = NVNwindow::default();
-        unsafe {
-            ffi::window_initialize(&mut window, &self.0);
-        }
-
-        Window(window)
+    pub fn build(&self) -> Option<Owned<Window>> {
+        Owned::<Window>::try_new(|window| unsafe { ffi::window_initialize(window.as_ptr(), &self.0) })
     }
 }

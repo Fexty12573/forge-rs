@@ -1,3 +1,4 @@
+use core::cell::UnsafeCell;
 use core::ffi::CStr;
 use core::time::Duration;
 
@@ -5,38 +6,33 @@ use sys::nvn::types::NVNsync;
 
 use crate::nvn::device::Device;
 
+use crate::nvn::owned::{Owned, impl_object};
 use crate::nvn::{SyncWaitResult, funcs as ffi};
 
 #[repr(transparent)]
-pub struct Sync(pub NVNsync);
+pub struct Sync(UnsafeCell<NVNsync>);
+
+impl_object!(Sync, NVNsync, ffi::sync_finalize);
 
 impl Sync {
-    pub fn new(device: &Device) -> Self {
-        let mut sync = NVNsync::default();
-        unsafe {
-            ffi::sync_initialize(&mut sync, device.as_ptr());
-        }
+    #[inline]
+    pub fn as_ptr(&self) -> *mut NVNsync {
+        self.0.get()
+    }
 
-        Self(sync)
+    pub fn new(device: &Device) -> Option<Owned<Self>> {
+        Owned::<Self>::try_new(|sync| unsafe { ffi::sync_initialize(sync.as_ptr(), device.as_ptr()) })
     }
 
     #[inline]
     pub fn set_debug_label(&mut self, label: &CStr) {
         unsafe {
-            ffi::sync_set_debug_label(&mut self.0, label.as_ptr());
+            ffi::sync_set_debug_label(self.as_ptr(), label.as_ptr());
         }
     }
 
     #[inline]
     pub fn wait(&self, timeout: Duration) -> SyncWaitResult {
-        unsafe { ffi::sync_wait(&self.0, timeout.as_nanos() as u64) }
-    }
-}
-
-impl Drop for Sync {
-    fn drop(&mut self) {
-        unsafe {
-            ffi::sync_finalize(&mut self.0);
-        }
+        unsafe { ffi::sync_wait(self.as_ptr(), timeout.as_nanos() as u64) }
     }
 }

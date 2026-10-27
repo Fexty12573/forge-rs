@@ -1,7 +1,8 @@
 use core::ffi::c_void;
 
-use sys::nvn::types::{NVNmemoryPool, NVNmemoryPoolBuilder};
+use sys::nvn::types::NVNmemoryPoolBuilder;
 
+use crate::nvn::owned::Owned;
 use crate::nvn::{MemoryPoolFlags_, device::Device, funcs as ffi, memory_pool::MemoryPool};
 
 #[repr(transparent)]
@@ -50,12 +51,7 @@ impl MemoryPoolBuilder {
         unsafe { ffi::memory_pool_builder_get_flags(&self.0) }
     }
 
-    pub fn build(&self) -> MemoryPool {
-        let mut pool = NVNmemoryPool::default();
-        unsafe {
-            ffi::memory_pool_initialize(&mut pool, &self.0);
-        }
-
-        MemoryPool(pool)
+    pub fn build(&self) -> Option<Owned<MemoryPool>> {
+        Owned::<MemoryPool>::try_new(|pool| unsafe { ffi::memory_pool_initialize(pool.as_ptr(), &self.0) })
     }
 }

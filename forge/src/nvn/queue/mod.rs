@@ -5,6 +5,7 @@ use core::{cell::UnsafeCell, ffi::CStr};
 pub use builder::QueueBuilder;
 use sys::nvn::types::NVNqueue;
 
+use crate::nvn::owned::impl_object;
 use crate::nvn::{
     CommandHandle, QueueAcquireTextureResult, QueueErrorInfo, QueueGetErrorResult, SyncCondition, funcs as ffi, sync::Sync,
     window::Window,
@@ -12,6 +13,8 @@ use crate::nvn::{
 
 #[repr(transparent)]
 pub struct Queue(UnsafeCell<NVNqueue>);
+
+impl_object!(Queue, NVNqueue, ffi::queue_finalize);
 
 impl Queue {
     /// # Safety
@@ -33,13 +36,11 @@ impl Queue {
         self.0.get()
     }
 
+    /// # Safety
+    /// The object must not be used afterwards, and must not be owned by an [`Owned`](crate::nvn::owned::Owned),
+    /// which finalizes it on drop.
     #[inline]
-    pub fn initialize(&mut self, builder: &QueueBuilder) -> bool {
-        unsafe { ffi::queue_initialize(self.as_ptr(), &builder.0) }
-    }
-
-    #[inline]
-    pub fn finalize(&mut self) {
+    pub unsafe fn finalize(&mut self) {
         unsafe {
             ffi::queue_finalize(self.as_ptr());
         }
@@ -103,7 +104,7 @@ impl Queue {
     #[inline]
     pub fn present_texture(&mut self, window: &mut Window, tex_id: i32) {
         unsafe {
-            ffi::queue_present_texture(self.as_ptr(), &mut window.0, tex_id);
+            ffi::queue_present_texture(self.as_ptr(), window.as_ptr(), tex_id);
         }
     }
 
@@ -112,7 +113,7 @@ impl Queue {
         let mut idx: i32 = 0;
 
         use sys::nvn::types::NVNacquireTextureResult::*;
-        match unsafe { ffi::queue_acquire_texture(self.as_ptr(), &mut window.0, &mut idx) } {
+        match unsafe { ffi::queue_acquire_texture(self.as_ptr(), window.as_ptr(), &mut idx) } {
             Success => QueueAcquireTextureResult::Success { index: idx },
             NativeError => QueueAcquireTextureResult::NativeError,
         }
@@ -121,12 +122,12 @@ impl Queue {
     #[inline]
     pub fn fence_sync(&mut self, sync: &mut Sync, cond: SyncCondition, flush_cpu: bool) {
         unsafe {
-            ffi::queue_fence_sync(self.as_ptr(), &mut sync.0, cond, flush_cpu as i32);
+            ffi::queue_fence_sync(self.as_ptr(), sync.as_ptr(), cond, flush_cpu as i32);
         }
     }
 
     #[inline]
     pub fn wait_sync(&mut self, sync: &Sync) -> bool {
-        unsafe { ffi::queue_wait_sync(self.as_ptr(), &sync.0) }
+        unsafe { ffi::queue_wait_sync(self.as_ptr(), sync.as_ptr()) }
     }
 }

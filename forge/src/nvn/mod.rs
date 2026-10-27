@@ -9,6 +9,7 @@ pub mod device;
 pub mod event;
 mod funcs;
 pub mod memory_pool;
+pub mod owned;
 pub mod program;
 pub mod queue;
 pub mod sampler;
@@ -20,6 +21,7 @@ pub mod texture_pool;
 pub mod window;
 
 pub use aliases::*;
+pub use owned::{Object, Owned};
 pub use texture::{ImageHandle, TextureHandle};
 
 #[unsafe(no_mangle)]

@@ -11,6 +11,7 @@ use sys::nvn::{
     types::NVNdevice,
 };
 
+use crate::nvn::owned::impl_object;
 use crate::nvn::{
     CommandHandle, CounterData, DebugCallbackSeverity, DebugCallbackSource, DebugCallbackType, DebugDomainId, DebugObjectType,
     DepthMode, DeviceInfo, Format, SeparateSamplerHandle, SeparateTextureHandle, WindowOriginMode,
@@ -21,6 +22,8 @@ use super::funcs as ffi;
 
 #[repr(transparent)]
 pub struct Device(UnsafeCell<NVNdevice>);
+
+impl_object!(Device, NVNdevice, ffi::device_finalize);
 
 impl Device {
     /// # Safety
@@ -42,13 +45,11 @@ impl Device {
         self.0.get()
     }
 
+    /// # Safety
+    /// The object must not be used afterwards, and must not be owned by an [`Owned`](crate::nvn::owned::Owned),
+    /// which finalizes it on drop.
     #[inline]
-    pub fn initialize(&mut self, builder: &DeviceBuilder) -> bool {
-        unsafe { ffi::device_initialize(self.as_ptr(), &builder.0) }
-    }
-
-    #[inline]
-    pub fn finalize(&mut self) {
+    pub unsafe fn finalize(&mut self) {
         unsafe {
             ffi::device_finalize(self.as_ptr());
         }

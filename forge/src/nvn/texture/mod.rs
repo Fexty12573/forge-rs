@@ -1,3 +1,4 @@
+use core::cell::UnsafeCell;
 use core::ffi::{CStr, c_void};
 use core::mem::MaybeUninit;
 
@@ -10,6 +11,7 @@ pub use builder::TextureBuilder;
 pub use view::TextureView;
 pub(crate) use view::view_ptr;
 
+use crate::nvn::owned::impl_object;
 use crate::nvn::{
     CopyRegion, Format, StorageClass, TextureAddress, TextureDepthStencilMode, TextureFlags_, TextureSwizzle, TextureTarget,
     funcs as ffi, memory_pool::MemoryPool,
@@ -19,69 +21,76 @@ pub type TextureHandle = NVNtextureHandle;
 pub type ImageHandle = NVNimageHandle;
 
 #[repr(transparent)]
-pub struct Texture(pub NVNtexture);
+pub struct Texture(UnsafeCell<NVNtexture>);
+
+impl_object!(Texture, NVNtexture, ffi::texture_finalize);
 
 impl Texture {
     #[inline]
+    pub fn as_ptr(&self) -> *mut NVNtexture {
+        self.0.get()
+    }
+
+    #[inline]
     pub fn set_debug_label(&mut self, label: &CStr) {
         unsafe {
-            ffi::texture_set_debug_label(&mut self.0, label.as_ptr());
+            ffi::texture_set_debug_label(self.as_ptr(), label.as_ptr());
         }
     }
 
     #[inline]
     pub fn get_zcull_storage_size(&self) -> usize {
-        unsafe { ffi::texture_get_zcull_storage_size(&self.0) }
+        unsafe { ffi::texture_get_zcull_storage_size(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_storage_class(&self) -> StorageClass {
-        unsafe { ffi::texture_get_storage_class(&self.0) }
+        unsafe { ffi::texture_get_storage_class(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_view_offset(&self, view: Option<&TextureView>) -> isize {
-        unsafe { ffi::texture_get_view_offset(&self.0, view_ptr(view)) }
+        unsafe { ffi::texture_get_view_offset(self.as_ptr(), view_ptr(view)) }
     }
 
     #[inline]
     pub fn get_flags(&self) -> TextureFlags_ {
-        unsafe { ffi::texture_get_flags(&self.0) }
+        unsafe { ffi::texture_get_flags(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_target(&self) -> TextureTarget {
-        unsafe { ffi::texture_get_target(&self.0) }
+        unsafe { ffi::texture_get_target(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_width(&self) -> i32 {
-        unsafe { ffi::texture_get_width(&self.0) }
+        unsafe { ffi::texture_get_width(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_height(&self) -> i32 {
-        unsafe { ffi::texture_get_height(&self.0) }
+        unsafe { ffi::texture_get_height(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_depth(&self) -> i32 {
-        unsafe { ffi::texture_get_depth(&self.0) }
+        unsafe { ffi::texture_get_depth(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_levels(&self) -> i32 {
-        unsafe { ffi::texture_get_levels(&self.0) }
+        unsafe { ffi::texture_get_levels(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_format(&self) -> Format {
-        unsafe { ffi::texture_get_format(&self.0) }
+        unsafe { ffi::texture_get_format(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_samples(&self) -> i32 {
-        unsafe { ffi::texture_get_samples(&self.0) }
+        unsafe { ffi::texture_get_samples(self.as_ptr()) }
     }
 
     #[inline]
@@ -91,24 +100,24 @@ impl Texture {
         let mut b = MaybeUninit::uninit();
         let mut a = MaybeUninit::uninit();
         unsafe {
-            ffi::texture_get_swizzle(&self.0, r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr(), a.as_mut_ptr());
+            ffi::texture_get_swizzle(self.as_ptr(), r.as_mut_ptr(), g.as_mut_ptr(), b.as_mut_ptr(), a.as_mut_ptr());
             (r.assume_init(), g.assume_init(), b.assume_init(), a.assume_init())
         }
     }
 
     #[inline]
     pub fn get_depth_stencil_mode(&self) -> TextureDepthStencilMode {
-        unsafe { ffi::texture_get_depth_stencil_mode(&self.0) }
+        unsafe { ffi::texture_get_depth_stencil_mode(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_stride(&self) -> isize {
-        unsafe { ffi::texture_get_stride(&self.0) }
+        unsafe { ffi::texture_get_stride(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_texture_address(&self) -> TextureAddress {
-        unsafe { ffi::texture_get_texture_address(&self.0) }
+        unsafe { ffi::texture_get_texture_address(self.as_ptr()) }
     }
 
     /// # Safety
@@ -116,7 +125,7 @@ impl Texture {
     #[inline]
     pub unsafe fn write_texels(&self, view: Option<&TextureView>, region: &CopyRegion, data: *const c_void) {
         unsafe {
-            ffi::texture_write_texels(&self.0, view_ptr(view), region, data);
+            ffi::texture_write_texels(self.as_ptr(), view_ptr(view), region, data);
         }
     }
 
@@ -132,7 +141,7 @@ impl Texture {
         image_stride: isize,
     ) {
         unsafe {
-            ffi::texture_write_texels_strided(&self.0, view_ptr(view), region, data, row_stride, image_stride);
+            ffi::texture_write_texels_strided(self.as_ptr(), view_ptr(view), region, data, row_stride, image_stride);
         }
     }
 
@@ -141,7 +150,7 @@ impl Texture {
     #[inline]
     pub unsafe fn read_texels(&self, view: Option<&TextureView>, region: &CopyRegion, data: *mut c_void) {
         unsafe {
-            ffi::texture_read_texels(&self.0, view_ptr(view), region, data);
+            ffi::texture_read_texels(self.as_ptr(), view_ptr(view), region, data);
         }
     }
 
@@ -157,54 +166,46 @@ impl Texture {
         image_stride: isize,
     ) {
         unsafe {
-            ffi::texture_read_texels_strided(&self.0, view_ptr(view), region, data, row_stride, image_stride);
+            ffi::texture_read_texels_strided(self.as_ptr(), view_ptr(view), region, data, row_stride, image_stride);
         }
     }
 
     #[inline]
     pub fn flush_texels(&self, view: Option<&TextureView>, region: &CopyRegion) {
         unsafe {
-            ffi::texture_flush_texels(&self.0, view_ptr(view), region);
+            ffi::texture_flush_texels(self.as_ptr(), view_ptr(view), region);
         }
     }
 
     #[inline]
     pub fn invalidate_texels(&self, view: Option<&TextureView>, region: &CopyRegion) {
         unsafe {
-            ffi::texture_invalidate_texels(&self.0, view_ptr(view), region);
+            ffi::texture_invalidate_texels(self.as_ptr(), view_ptr(view), region);
         }
     }
 
     #[inline]
     pub fn get_memory_pool(&self) -> Option<&MemoryPool> {
-        unsafe { ffi::texture_get_memory_pool(&self.0).cast::<MemoryPool>().as_ref() }
+        unsafe { ffi::texture_get_memory_pool(self.as_ptr()).cast::<MemoryPool>().as_ref() }
     }
 
     #[inline]
     pub fn get_memory_offset(&self) -> isize {
-        unsafe { ffi::texture_get_memory_offset(&self.0) }
+        unsafe { ffi::texture_get_memory_offset(self.as_ptr()) }
     }
 
     #[inline]
     pub fn get_storage_size(&self) -> i32 {
-        unsafe { ffi::texture_get_storage_size(&self.0) }
+        unsafe { ffi::texture_get_storage_size(self.as_ptr()) }
     }
 
     #[inline]
     pub fn compare(&self, other: &Texture) -> bool {
-        unsafe { ffi::texture_compare(&self.0, &other.0) }
+        unsafe { ffi::texture_compare(self.as_ptr(), other.as_ptr()) }
     }
 
     #[inline]
     pub fn get_debug_id(&self) -> u64 {
-        unsafe { ffi::texture_get_debug_id(&self.0) }
-    }
-}
-
-impl Drop for Texture {
-    fn drop(&mut self) {
-        unsafe {
-            ffi::texture_finalize(&mut self.0);
-        }
+        unsafe { ffi::texture_get_debug_id(self.as_ptr()) }
     }
 }

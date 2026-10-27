@@ -5,10 +5,12 @@ use sys::nvn::types::NVNqueueBuilder;
 #[repr(transparent)]
 pub struct QueueBuilder(pub NVNqueueBuilder);
 
+use crate::nvn::owned::Owned;
 use crate::nvn::{
     QueueBuilderFlags_,
     device::Device,
     funcs::{self as ffi},
+    queue::Queue,
 };
 
 impl QueueBuilder {
@@ -84,5 +86,9 @@ impl QueueBuilder {
 
     pub fn get_queue_mem_size(&self) -> usize {
         unsafe { ffi::queue_builder_get_queue_memory_size(&self.0) }
+    }
+
+    pub fn build(&self) -> Option<Owned<Queue>> {
+        Owned::<Queue>::try_new(|queue| unsafe { ffi::queue_initialize(queue.as_ptr(), &self.0) })
     }
 }

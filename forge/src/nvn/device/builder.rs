@@ -1,6 +1,7 @@
 use sys::nvn::types::NVNdeviceBuilder;
 
-use crate::nvn::{DeviceFlags_, funcs as ffi};
+use crate::nvn::owned::Owned;
+use crate::nvn::{DeviceFlags_, device::Device, funcs as ffi};
 
 #[repr(transparent)]
 pub struct DeviceBuilder(pub NVNdeviceBuilder);
@@ -20,5 +21,9 @@ impl DeviceBuilder {
             ffi::device_builder_set_flags(&mut self.0, flags);
         }
         self
+    }
+
+    pub fn build(&self) -> Option<Owned<Device>> {
+        Owned::<Device>::try_new(|device| unsafe { ffi::device_initialize(device.as_ptr(), &self.0) })
     }
 }

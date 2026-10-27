@@ -1,8 +1,9 @@
 use core::ffi::c_void;
 use core::mem::MaybeUninit;
 
-use sys::nvn::types::{NVNtexture, NVNtextureBuilder};
+use sys::nvn::types::NVNtextureBuilder;
 
+use crate::nvn::owned::Owned;
 use crate::nvn::{
     Format, PackagedTextureLayout, StorageClass, TextureDepthStencilMode, TextureFlags_, TextureSwizzle, TextureTarget,
     device::Device, funcs as ffi, memory_pool::MemoryPool, texture::Texture,
@@ -121,7 +122,7 @@ impl TextureBuilder {
 
     pub fn set_storage(&mut self, pool: &MemoryPool, offset: isize) -> &mut Self {
         unsafe {
-            ffi::texture_builder_set_storage(&mut self.0, (&raw const pool.0).cast_mut(), offset);
+            ffi::texture_builder_set_storage(&mut self.0, pool.as_ptr(), offset);
         }
         self
     }
@@ -239,12 +240,7 @@ impl TextureBuilder {
         unsafe { ffi::texture_builder_get_memory_offset(&self.0) }
     }
 
-    pub fn build(&self) -> Texture {
-        let mut texture = NVNtexture::default();
-        unsafe {
-            ffi::texture_initialize(&mut texture, &self.0);
-        }
-
-        Texture(texture)
+    pub fn build(&self) -> Option<Owned<Texture>> {
+        Owned::<Texture>::try_new(|texture| unsafe { ffi::texture_initialize(texture.as_ptr(), &self.0) })
     }
 }

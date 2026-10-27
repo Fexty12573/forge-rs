@@ -1,5 +1,6 @@
-use sys::nvn::types::{NVNbuffer, NVNbufferBuilder};
+use sys::nvn::types::NVNbufferBuilder;
 
+use crate::nvn::owned::Owned;
 use crate::nvn::{buffer::Buffer, device::Device, funcs as ffi, memory_pool::MemoryPool};
 
 #[repr(transparent)]
@@ -24,7 +25,7 @@ impl BufferBuilder {
 
     pub fn set_storage(&mut self, pool: &MemoryPool, offset: isize, size: usize) -> &mut Self {
         unsafe {
-            ffi::buffer_builder_set_storage(&mut self.0, (&raw const pool.0).cast_mut(), offset, size);
+            ffi::buffer_builder_set_storage(&mut self.0, pool.as_ptr(), offset, size);
         }
         self
     }
@@ -41,12 +42,7 @@ impl BufferBuilder {
         unsafe { ffi::buffer_builder_get_size(&self.0) }
     }
 
-    pub fn build(&self) -> Buffer {
-        let mut buffer = NVNbuffer::default();
-        unsafe {
-            ffi::buffer_initialize(&mut buffer, &self.0);
-        }
-
-        Buffer(buffer)
+    pub fn build(&self) -> Option<Owned<Buffer>> {
+        Owned::<Buffer>::try_new(|buffer| unsafe { ffi::buffer_initialize(buffer.as_ptr(), &self.0) })
     }
 }
