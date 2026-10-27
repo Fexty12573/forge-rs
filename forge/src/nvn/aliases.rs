@@ -66,6 +66,19 @@ pub type CommandHandle = NVNcommandHandle;
 pub type SeparateTextureHandle = NVNseparateTextureHandle;
 pub type SeparateSamplerHandle = NVNseparateSamplerHandle;
 pub type QueueErrorInfo = NVNqueueErrorInfo;
+pub type NativeWindow = NVNnativeWindow;
+pub type BufferAddress = NVNbufferAddress;
+pub type TextureAddress = NVNtextureAddress;
+pub type StorageClass = NVNstorageClass;
+pub type SubroutineLinkageMapPtr = NVNsubroutineLinkageMapPtr;
+pub type BufferRange = NVNbufferRange;
+pub type Rectangle = NVNrectangle;
+pub type ShaderData = NVNshaderData;
+pub type CopyRegion = NVNcopyRegion;
+pub type PackagedTextureLayout = NVNpackagedTextureLayout;
+pub type SamplerReduction = NVNsamplerReduction;
+pub type CommandBufferMemoryEvent = NVNcommandBufferMemoryEvent;
+pub type WindowAcquireTextureResult = QueueAcquireTextureResult;
 pub enum QueueAcquireTextureResult {
     Success { index: i32 },
     NativeError,

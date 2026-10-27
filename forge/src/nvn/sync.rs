@@ -7,6 +7,7 @@ use crate::nvn::device::Device;
 
 use crate::nvn::{SyncWaitResult, funcs as ffi};
 
+#[repr(transparent)]
 pub struct Sync(pub NVNsync);
 
 impl Sync {

@@ -3,11 +3,17 @@ use core::{
     ffi::{CStr, c_uchar, c_void},
 };
 
-use sys::nvn::types::NVNdevice;
+mod builder;
+
+pub use builder::DeviceBuilder;
+use sys::nvn::{
+    fptr::{FnGenericFuncPtr, FnWalkDebugDatabaseCallback},
+    types::NVNdevice,
+};
 
 use crate::nvn::{
-    CommandHandle, CounterData, DebugCallbackSeverity, DebugCallbackSource, DebugCallbackType, DebugDomainId, DepthMode,
-    DeviceInfo, Format, SeparateSamplerHandle, SeparateTextureHandle, WindowOriginMode,
+    CommandHandle, CounterData, DebugCallbackSeverity, DebugCallbackSource, DebugCallbackType, DebugDomainId, DebugObjectType,
+    DepthMode, DeviceInfo, Format, SeparateSamplerHandle, SeparateTextureHandle, WindowOriginMode,
     texture::{ImageHandle, TextureHandle},
 };
 
@@ -37,10 +43,20 @@ impl Device {
     }
 
     #[inline]
+    pub fn initialize(&mut self, builder: &DeviceBuilder) -> bool {
+        unsafe { ffi::device_initialize(self.as_ptr(), &builder.0) }
+    }
+
+    #[inline]
     pub fn finalize(&mut self) {
         unsafe {
             ffi::device_finalize(self.as_ptr());
         }
+    }
+
+    #[inline]
+    pub fn get_proc_address(&self, name: &CStr) -> Option<FnGenericFuncPtr> {
+        unsafe { ffi::device_get_proc_address(self.as_ptr(), name.as_ptr()) }
     }
 
     #[inline]
@@ -162,6 +178,13 @@ impl Device {
     pub fn finalize_command_handle(&mut self, handle: CommandHandle) {
         unsafe {
             ffi::device_finalize_command_handle(self.as_ptr(), handle);
+        }
+    }
+
+    #[inline]
+    pub fn walk_debug_database(&self, ty: DebugObjectType, cb: FnWalkDebugDatabaseCallback, user: *mut c_void) {
+        unsafe {
+            ffi::device_walk_debug_database(self.as_ptr(), ty, cb, user);
         }
     }
 

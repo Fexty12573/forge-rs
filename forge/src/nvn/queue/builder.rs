@@ -2,6 +2,7 @@ use core::ffi::c_void;
 
 use sys::nvn::types::NVNqueueBuilder;
 
+#[repr(transparent)]
 pub struct QueueBuilder(pub NVNqueueBuilder);
 
 use crate::nvn::{
@@ -67,5 +68,21 @@ impl QueueBuilder {
             ffi::queue_builder_set_queue_memory(&mut self.0, memory, size);
         }
         self
+    }
+
+    pub fn get_device(&self) -> Option<&Device> {
+        unsafe { ffi::queue_builder_get_device(&self.0).cast::<Device>().as_ref() }
+    }
+
+    pub fn get_flags(&self) -> QueueBuilderFlags_ {
+        unsafe { ffi::queue_builder_get_flags(&self.0) }
+    }
+
+    pub fn get_command_mem_size(&self) -> usize {
+        unsafe { ffi::queue_builder_get_command_memory_size(&self.0) }
+    }
+
+    pub fn get_queue_mem_size(&self) -> usize {
+        unsafe { ffi::queue_builder_get_queue_memory_size(&self.0) }
     }
 }

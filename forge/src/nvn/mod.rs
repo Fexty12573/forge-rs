@@ -3,11 +3,21 @@ use sys::nvn::fptr::{FnDeviceGetProcAddress, NVNprocs};
 use crate::os::sync::OnceLock;
 
 mod aliases;
+pub mod buffer;
+pub mod command_buffer;
 pub mod device;
+pub mod event;
 mod funcs;
+pub mod memory_pool;
+pub mod program;
 pub mod queue;
+pub mod sampler;
+pub mod sampler_pool;
+pub mod state;
 pub mod sync;
 pub mod texture;
+pub mod texture_pool;
+pub mod window;
 
 pub use aliases::*;
 pub use texture::{ImageHandle, TextureHandle};
