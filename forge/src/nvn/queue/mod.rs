@@ -20,14 +20,14 @@ impl Queue {
     /// # Safety
     /// `ptr` must be non-null and point to an initialized `NVNdevice` that
     /// stays valid for `'a`.
-    pub fn from_ptr_mut<'a>(ptr: *mut NVNqueue) -> &'a mut Self {
+    pub unsafe fn from_ptr_mut<'a>(ptr: *mut NVNqueue) -> &'a mut Self {
         unsafe { &mut *ptr.cast() }
     }
 
     /// # Safety
     /// `ptr` must be non-null and point to an initialized `NVNdevice` that
     /// stays valid for `'a`.
-    pub fn from_ptr<'a>(ptr: *const NVNqueue) -> &'a Self {
+    pub unsafe fn from_ptr<'a>(ptr: *const NVNqueue) -> &'a Self {
         unsafe { &*ptr.cast() }
     }
 

@@ -55,6 +55,33 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
     expanded.into()
 }
 
+#[cfg(feature = "nvn")]
+#[proc_macro_attribute]
+pub fn nvn_init(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let inner = parse_macro_input!(item as ItemFn);
+    let inner_name = &inner.sig.ident;
+
+    let expanded = quote! {
+        #[inline(always)]
+        #inner
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn forge_onNvnInit(get_proc_addr: Option<::forge::sys::nvn::fptr::FnDeviceGetProcAddress>,
+            device: *mut ::forge::sys::nvn::types::NVNdevice,
+            queue: *mut ::forge::sys::nvn::types::NVNqueue) {
+            ::forge::nvn::__load_procs(get_proc_addr);
+
+            let (device, queue): (&'static mut ::forge::nvn::device::Device, &'static mut ::forge::nvn::queue::Queue) = unsafe {
+                (::forge::nvn::device::Device::from_ptr_mut(device), ::forge::nvn::queue::Queue::from_ptr_mut(queue))
+            };
+
+            #inner_name(device, queue);
+        }
+    };
+
+    expanded.into()
+}
+
 /// Callback for rendering imgui UI in the main forge window
 ///
 /// ### Example

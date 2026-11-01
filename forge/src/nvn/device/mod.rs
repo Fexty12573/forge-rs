@@ -29,14 +29,14 @@ impl Device {
     /// # Safety
     /// `ptr` must be non-null, point to an initialized `NVNdevice`, and no other
     /// reference to it may be live for `'a`.
-    pub fn from_ptr_mut<'a>(ptr: *mut NVNdevice) -> &'a mut Device {
+    pub unsafe fn from_ptr_mut<'a>(ptr: *mut NVNdevice) -> &'a mut Device {
         unsafe { &mut *ptr.cast() }
     }
 
     /// # Safety
     /// `ptr` must be non-null and point to an initialized `NVNdevice` that
     /// stays valid for `'a`.
-    pub fn from_ptr<'a>(ptr: *const NVNdevice) -> &'a Device {
+    pub unsafe fn from_ptr<'a>(ptr: *const NVNdevice) -> &'a Device {
         unsafe { &*ptr.cast() }
     }
 

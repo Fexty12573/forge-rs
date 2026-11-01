@@ -26,6 +26,13 @@ pub struct Texture(UnsafeCell<NVNtexture>);
 impl_object!(Texture, NVNtexture, ffi::texture_finalize);
 
 impl Texture {
+    /// # Safety
+    /// `ptr` must be non-null, point to an initialized `NVNtexture`, and the
+    /// pointer must stay valid for 'a.
+    pub unsafe fn from_ptr<'a>(ptr: *const NVNtexture) -> &'a Texture {
+        unsafe { &*ptr.cast() }
+    }
+
     #[inline]
     pub fn as_ptr(&self) -> *mut NVNtexture {
         self.0.get()

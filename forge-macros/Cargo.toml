@@ -15,6 +15,7 @@ proc-macro = true
 [features]
 imgui = []
 config = []
+nvn = []
 
 [dependencies]
 proc-macro2 = "1"

@@ -1,4 +1,7 @@
-use sys::nvn::fptr::{FnDeviceGetProcAddress, NVNprocs};
+use sys::{
+    graphics::forge_graphics_getSwapChainTextures,
+    nvn::fptr::{FnDeviceGetProcAddress, NVNprocs},
+};
 
 use crate::os::sync::OnceLock;
 
@@ -24,8 +27,8 @@ pub use aliases::*;
 pub use owned::{Object, Owned};
 pub use texture::{ImageHandle, TextureHandle};
 
-#[unsafe(no_mangle)]
-extern "C" fn forge_onNvnInit(get_proc_addr: Option<FnDeviceGetProcAddress>) {
+#[doc(hidden)]
+pub fn __load_procs(get_proc_addr: Option<FnDeviceGetProcAddress>) {
     if let Some(func) = get_proc_addr {
         NVN_PROCS.get_or_init(|| unsafe { NVNprocs::load(core::ptr::null(), func) });
     }
@@ -40,4 +43,19 @@ static NVN_PROCS: OnceLock<NVNprocs> = OnceLock::new();
 #[inline]
 pub fn procs() -> &'static NVNprocs {
     NVN_PROCS.get().expect("NVN has not been initialized yet")
+}
+
+/// Calls f with the current swap-chain render targets.
+pub fn with_render_targets(f: impl FnOnce(&[&texture::Texture])) {
+    let mut count = 0;
+    let textures = unsafe {
+        let ptrs = forge_graphics_getSwapChainTextures(&mut count);
+        if ptrs.is_null() || count == 0 {
+            &[]
+        } else {
+            ::core::slice::from_raw_parts(ptrs.cast(), count)
+        }
+    };
+
+    f(textures);
 }
