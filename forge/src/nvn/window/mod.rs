@@ -17,6 +17,20 @@ pub struct Window(UnsafeCell<NVNwindow>);
 impl_object!(Window, NVNwindow, ffi::window_finalize);
 
 impl Window {
+    /// # Safety
+    /// `ptr` must be non-null and point to an initialized `NVNwindow` that
+    /// stays valid for `'a`.
+    pub unsafe fn from_ptr_mut<'a>(ptr: *mut NVNwindow) -> &'a mut Self {
+        unsafe { &mut *ptr.cast() }
+    }
+
+    /// # Safety
+    /// `ptr` must be non-null and point to an initialized `NVNwindow` that
+    /// stays valid for `'a`.
+    pub unsafe fn from_ptr<'a>(ptr: *const NVNwindow) -> &'a Self {
+        unsafe { &*ptr.cast() }
+    }
+
     #[inline]
     pub fn as_ptr(&self) -> *mut NVNwindow {
         self.0.get()

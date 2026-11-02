@@ -25,6 +25,8 @@ pub struct Device(UnsafeCell<NVNdevice>);
 
 impl_object!(Device, NVNdevice, ffi::device_finalize);
 
+unsafe impl Sync for Device {}
+
 impl Device {
     /// # Safety
     /// `ptr` must be non-null, point to an initialized `NVNdevice`, and no other

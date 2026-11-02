@@ -16,6 +16,8 @@ pub struct Queue(UnsafeCell<NVNqueue>);
 
 impl_object!(Queue, NVNqueue, ffi::queue_finalize);
 
+unsafe impl core::marker::Sync for Queue {}
+
 impl Queue {
     /// # Safety
     /// `ptr` must be non-null and point to an initialized `NVNdevice` that
@@ -69,7 +71,7 @@ impl Queue {
     }
 
     #[inline]
-    pub fn get_error(&self, info: *mut QueueErrorInfo) -> QueueGetErrorResult {
+    pub fn get_error(&mut self, info: *mut QueueErrorInfo) -> QueueGetErrorResult {
         unsafe { ffi::queue_get_error(self.as_ptr(), info) }
     }
 
