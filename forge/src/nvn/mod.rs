@@ -42,7 +42,9 @@ static NVN_PROCS: OnceLock<NVNprocs> = OnceLock::new();
 /// Panics if called before the loader has initialized NVN.
 #[inline]
 pub fn procs() -> &'static NVNprocs {
-    NVN_PROCS.get().expect("NVN has not been initialized yet")
+    NVN_PROCS
+        .get()
+        .expect("NVN has not been initialized yet. Make sure you have a function marked #[nvn_init]")
 }
 
 /// Calls f with the current swap-chain render targets.
