@@ -29,6 +29,7 @@ pub mod state;
 pub mod sync;
 pub mod texture;
 pub mod texture_pool;
+pub mod util;
 pub mod window;
 
 pub use aliases::*;

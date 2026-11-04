@@ -27,6 +27,10 @@ use crate::nvn::{
     texture_pool::TexturePool,
 };
 
+mod managed;
+
+pub use managed::ManagedCommandBuffer;
+
 #[repr(transparent)]
 pub struct CommandBuffer(UnsafeCell<NVNcommandBuffer>);
 

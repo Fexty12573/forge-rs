@@ -33,6 +33,6 @@ impl Sync {
 
     #[inline]
     pub fn wait(&self, timeout: Duration) -> SyncWaitResult {
-        unsafe { ffi::sync_wait(self.as_ptr(), timeout.as_nanos() as u64) }
+        unsafe { ffi::sync_wait(self.as_ptr(), u64::try_from(timeout.as_nanos()).unwrap_or(u64::MAX)) }
     }
 }
