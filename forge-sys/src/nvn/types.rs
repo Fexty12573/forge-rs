@@ -507,7 +507,7 @@ impl NVNshaderStageBits {
     pub const GEOMETRY_BIT: i32 = 1 << 2;
     pub const TESS_CONTROL_BIT: i32 = 1 << 3;
     pub const TESS_EVALUATION_BIT: i32 = 1 << 4;
-    pub const COMPUTE_BIT: i32 = 1 << 4;
+    pub const COMPUTE_BIT: i32 = 1 << 5;
     pub const ALL_GRAPHICS_BITS: i32 = 0x1F;
     pub const ALL_BITS: i32 = 0x3F;
 }
