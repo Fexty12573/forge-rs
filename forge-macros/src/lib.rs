@@ -55,6 +55,74 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
     expanded.into()
 }
 
+/// Callback for when NVN is fully initialized.
+///
+/// You can get access to the device, queue and render targets with the
+/// corresponding `forge::nvn::with_*` function or just `forge::nvn::with`.
+///
+/// # Example
+/// ```ignore
+/// #[forge::nvn_ready]
+/// fn do_rendering_setup() {
+///     // Do any setup
+/// }
+/// ```
+#[cfg(feature = "nvn")]
+#[proc_macro_attribute]
+pub fn nvn_ready(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let inner = parse_macro_input!(item as ItemFn);
+    let inner_name = &inner.sig.ident;
+
+    let expanded = quote! {
+        #[inline(always)]
+        #inner
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn forge_onNvnReady() {
+            #inner_name();
+        }
+    };
+
+    expanded.into()
+}
+
+/// Callback for when NVN rendering should be done. Is called *after*
+/// the game completes all of its own rendering. You don't *have* to
+/// use this callback for rendering, you can technically render any
+/// time during the frame.
+///
+/// You can get access to the device, queue and render targets with the
+/// corresponding `forge::nvn::with_*` function or just `forge::nvn::with`.
+///
+/// # Note
+/// ImGui functions may **not** be used inside of this callback.
+///
+/// # Example
+/// ```ignore
+/// #[forge::nvn_render]
+/// fn do_rendering(window: &mut Window, tex_idx: i32) {
+///     // Render here
+/// }
+/// ```
+#[cfg(feature = "nvn")]
+#[proc_macro_attribute]
+pub fn nvn_render(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let inner = parse_macro_input!(item as ItemFn);
+    let inner_name = &inner.sig.ident;
+
+    let expanded = quote! {
+        #[inline(always)]
+        #inner
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn forge_onNvnRender(window: *mut ::forge::sys::nvn::types::NVNwindow, tex_idx: i32) {
+            #inner_name(unsafe{::forge::nvn::window::Window::from_ptr_mut(window)}, tex_idx);
+        }
+    };
+
+    expanded.into()
+}
+
 /// Callback for rendering imgui UI in the main forge window
 ///
 /// ### Example

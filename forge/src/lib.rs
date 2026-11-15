@@ -43,3 +43,9 @@ pub mod graphics;
 
 #[cfg(feature = "imgui")]
 pub mod imgui;
+
+#[cfg(feature = "nvn")]
+pub mod nvn;
+
+#[cfg(feature = "image")]
+pub mod image;

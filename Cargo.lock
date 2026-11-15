@@ -184,6 +184,7 @@ dependencies = [
  "mhgu-forge-macros",
  "mhgu-forge-rt",
  "mhgu-forge-sys",
+ "minipng",
 ]
 
 [[package]]
@@ -206,6 +207,12 @@ dependencies = [
 [[package]]
 name = "mhgu-forge-sys"
 version = "1.5.0"
+
+[[package]]
+name = "minipng"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de129e6db0b4c69f59cde83990a5844989a93bbd23ab2dfbe48e68740a59327c"
 
 [[package]]
 name = "once_cell_polyfill"
