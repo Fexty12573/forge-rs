@@ -1,8 +1,10 @@
 use alloc::{borrow::Cow, vec::Vec};
 
 pub mod dds;
+pub mod png;
 
 pub use dds::DdsError;
+pub use png::PngError;
 
 /// A decoded image, ready to be uploaded to a texture.
 ///
@@ -126,6 +128,15 @@ impl ImageFormat {
             Self::R8 => (Format::R8, None),
             Self::A8 => (Format::R8, Some([S::Zero, S::Zero, S::Zero, S::R])),
         }
+    }
+}
+
+impl Image<'static> {
+    /// Decodes a PNG file to [`ImageFormat::Rgba8`] with a single mip level.
+    ///
+    /// PNG data is assumed to be sRGB, so [`color_space`](Image::color_space) is [`ColorSpace::Srgb`].
+    pub fn from_png(bytes: &[u8]) -> Result<Self, PngError> {
+        png::decode(bytes)
     }
 }
 
