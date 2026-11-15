@@ -35,6 +35,11 @@ struct Chunks {
     cnt_idx: usize,
 }
 
+// SAFETY: `device` is the device the command buffer was created with, which must outlive it anyway.
+// It's only read by the memory callback, which runs on whichever thread is recording into the
+// command buffer, so moving the command buffer to another thread moves its use along with it.
+unsafe impl Send for Chunks {}
+
 impl ManagedCommandBuffer {
     /// Creates a new managed command buffer.
     pub fn new(device: &Device) -> Option<ManagedCommandBuffer> {

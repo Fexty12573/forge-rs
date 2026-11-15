@@ -10,6 +10,11 @@ pub struct AlignedStorage {
     layout: Layout,
 }
 
+// SAFETY: `AlignedStorage` uniquely owns its allocation, like a `Box<[u8]>`. The pointer is never
+// shared with another owner, and `&self` only hands out raw pointers, whose use is already `unsafe`.
+unsafe impl Send for AlignedStorage {}
+unsafe impl Sync for AlignedStorage {}
+
 impl AlignedStorage {
     /// Allocates a block of memory with the given size and alignment.
     pub fn new(size: usize, align: usize) -> Option<Self> {
