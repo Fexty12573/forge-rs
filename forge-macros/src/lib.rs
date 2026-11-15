@@ -6,7 +6,7 @@ use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{DeriveInput, FnArg, ItemFn, parse_macro_input, visit_mut::VisitMut};
+use syn::{DeriveInput, FnArg, ItemFn, ItemImpl, parse_macro_input, visit_mut::VisitMut};
 
 fn forge_crate() -> TokenStream2 {
     match crate_name("mhgu-forge") {
@@ -18,6 +18,7 @@ fn forge_crate() -> TokenStream2 {
 mod hook;
 #[cfg(feature = "config")]
 mod ini;
+mod plugin;
 mod pure_virtual;
 
 /// Marks a function as the plugins entry point.
@@ -53,6 +54,39 @@ pub fn entry(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     expanded.into()
+}
+
+/// Turns an `impl forge::Plugin for T` into the plugin's entry point.
+///
+/// Stores the plugin in a static, creates it with `Plugin::new` when the plugin is initialized, and
+/// exports a loader callback for every hook the impl defines. Hooks the impl doesn't define aren't
+/// exported at all. Replaces `#[forge::entry]`, which can't be used together with this.
+///
+/// See `forge::plugin` for details.
+///
+/// ### Example
+/// ```ignore
+/// struct MyPlugin {
+///     frames: u64,
+/// }
+///
+/// #[forge::plugin]
+/// impl forge::Plugin for MyPlugin {
+///     const NAME: &'static str = "My Plugin";
+///
+///     fn new() -> Self {
+///         Self { frames: 0 }
+///     }
+///
+///     fn on_update(&mut self, _dt: f32) {
+///         self.frames += 1;
+///     }
+/// }
+/// ```
+#[proc_macro_attribute]
+pub fn plugin(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let item = parse_macro_input!(item as ItemImpl);
+    plugin::plugin(item).unwrap_or_else(syn::Error::into_compile_error).into()
 }
 
 /// Callback for when NVN is fully initialized.

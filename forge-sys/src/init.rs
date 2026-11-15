@@ -1,3 +1,5 @@
+use core::ffi::c_char;
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ForgeVersion {
@@ -9,4 +11,6 @@ pub struct ForgeVersion {
 #[repr(C)]
 pub struct PluginInitParams {
     pub required_version: ForgeVersion,
+    /// NUL-terminated display name, shown in the loader's plugin list. Zeroed by the loader.
+    pub name: [c_char; 64],
 }

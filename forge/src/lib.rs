@@ -27,7 +27,10 @@ pub mod log;
 pub mod mem;
 pub mod os;
 pub mod patch;
+pub mod plugin;
 pub mod socket;
+
+pub use plugin::Plugin;
 
 #[cfg(feature = "patterns")]
 pub mod pattern;

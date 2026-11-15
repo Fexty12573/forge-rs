@@ -123,6 +123,7 @@ impl<T: ?Sized> Mutex<T> {
     ///
     /// # Panics
     /// Panics if the current thread already holds the lock.
+    #[track_caller]
     pub fn lock(&self) -> MutexGuard<'_, T> {
         let current = current_thread();
         assert!(!self.is_held_by(current), "Mutex is already locked by the current thread");
@@ -149,6 +150,7 @@ impl<T: ?Sized> Mutex<T> {
     ///
     /// # Panics
     /// Panics if the current thread already holds the lock.
+    #[track_caller]
     pub fn with<R>(&self, f: impl FnOnce(&mut T) -> R) -> R {
         f(&mut self.lock())
     }
