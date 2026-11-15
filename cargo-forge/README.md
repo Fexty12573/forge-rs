@@ -29,4 +29,9 @@ cargo forge build --release
 The output `my-amazing-plugin.nro` goes in `romfs/nativeNX/plugins` to be loaded
 by `forge`.
 
+For Switch hardware, see [NRO build and linking](../docs/nro-build.md). The
+embedded target template retains PIC and adds `-nostartfiles` and `-Wl,-z,text`.
+Existing projects must update their own target JSON; rebuilding this CLI does
+not change files in projects that have already been created.
+
 Part of the [forge-rs](https://github.com/Fexty12573/forge-rs) workspace.

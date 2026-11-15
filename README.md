@@ -32,3 +32,9 @@ cargo forge build --release
 ```
 
 Now you should find a `.nro` file in your Plugins root directory, e.g. `my-amazing-plugin.nro`. This file now needs to be placed into `romfs/nativeNX/plugins` and it will be loaded by `forge`.
+
+### Switch hardware builds
+
+See [NRO build and linking](docs/nro-build.md) for building the CLI from this
+checkout, the target JSON linker settings, and updating an existing plugin.
+Installing the published CLI does not include changes that exist only in this fork.
