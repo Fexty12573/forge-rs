@@ -38,6 +38,15 @@ impl From<(f32, f32)> for ImVec2 {
     }
 }
 
+impl From<(i32, i32)> for ImVec2 {
+    fn from(value: (i32, i32)) -> Self {
+        Self {
+            x: value.0 as f32,
+            y: value.1 as f32,
+        }
+    }
+}
+
 impl From<(f32, f32, f32, f32)> for ImVec4 {
     fn from(value: (f32, f32, f32, f32)) -> Self {
         Self {
@@ -45,6 +54,17 @@ impl From<(f32, f32, f32, f32)> for ImVec4 {
             y: value.1,
             z: value.2,
             w: value.3,
+        }
+    }
+}
+
+impl From<(i32, i32, i32, i32)> for ImVec4 {
+    fn from(value: (i32, i32, i32, i32)) -> Self {
+        Self {
+            x: value.0 as f32,
+            y: value.1 as f32,
+            z: value.2 as f32,
+            w: value.3 as f32,
         }
     }
 }
@@ -63,5 +83,20 @@ impl Default for ImVec4 {
             z: 0.0,
             w: 0.0,
         }
+    }
+}
+
+impl ImTextureRef_c {
+    pub const fn from_id(id: ImTextureID) -> Self {
+        Self {
+            _TexData: core::ptr::null_mut(),
+            _TexID: id,
+        }
+    }
+}
+
+impl From<ImTextureID> for ImTextureRef_c {
+    fn from(id: ImTextureID) -> Self {
+        Self::from_id(id)
     }
 }
